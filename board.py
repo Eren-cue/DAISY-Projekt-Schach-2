@@ -292,7 +292,19 @@ class Board(BoardBase):
         being within the allowed range (0 to 7 inclusively).
         Don´t forget to handle the special case of "cell" being None. Return False in that case
         """
-        # TODO: Implement
+        row, col = cell
+
+        if cell is None:
+            return False
+    
+        elif row < 0 or row > 7:
+            return False
+        
+        elif col < 0 or col > 7:
+            return False
+    
+        else:
+            return True
 
     def cell_is_valid_and_empty(self, cell):
         """
@@ -302,7 +314,12 @@ class Board(BoardBase):
         You can use the "is_valid_cell()" Method to verify the cell is valid in the first place.
         If so, use "get_cell()" to retrieve the piece placed on it and return True if there is None
         """
-        # TODO: Implement
+        if self.is_valid_cell(cell):
+            if self.get_cell(cell) is None:
+                return True
+        
+        else:
+            return False
 
     def piece_can_enter_cell(self, piece, cell):
         """
@@ -319,7 +336,14 @@ class Board(BoardBase):
         If, however, there is another piece, it must be of opposing color. Check the other pieces "white" attribute and compare against
         the given piece "white" attribute.
         """
-        # TODO: Implement
+        if self.cell_is_valid_and_empty(cell):
+            return True
+        
+        elif self.get_cell(cell).is_white() is not piece.is_white():
+            return True
+    
+        else:
+            return False
  
 
     def piece_can_hit_on_cell(self, piece, cell):
@@ -337,4 +361,10 @@ class Board(BoardBase):
         If, however, there is another piece, it must be of opposing color. Check the other pieces "white" attribute and compare against
         the given piece "white" attribute.
         """
-        # TODO: Implement
+        if self.is_valid_cell(cell):
+            if self.get_cell(cell) is not None:
+                if self.get_cell().is_white() is not piece.is_white():
+                    return True
+    
+        else:
+            return False

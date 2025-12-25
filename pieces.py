@@ -110,7 +110,30 @@ class Pawn(Piece):  # Bauer
         
         :return: A list of reachable cells this pawn could move into.
         """
-        # TODO: Implement a method that returns all cells this piece can enter in its next move
+        reachable_cells = []
+        row, col = self.cell
+
+        if self.white == True:
+            if self.cell_is_valid_and_empty(tuple(row+1, col)):
+                reachable_cells.append(tuple(row+1, col))
+            if row == 1 and self.cell_is_valid_and_empty(tuple(3, col)):
+                reachable_cells.append(tuple(3, col))
+            if self.can_hit_on_cell(tuple(row+1, col+1)):
+                reachable_cells.append(tuple(row+1, col+1))
+            if self.can_hit_on_cell(tuple(row+1, col-1)):
+                reachable_cells.append(tuple(row+1, col-1))
+
+        if self.white == False:
+            if self.cell_is_valid_and_empty(tuple(row-1, col)):
+                reachable_cells.append(tuple(row-1, col))
+            if row == 6 and self.cell_is_valid_and_empty(tuple(4, col)):
+                reachable_cells.append(tuple(4, col))
+            if self.can_hit_on_cell(tuple(row-1, col+1)):
+                reachable_cells.append(tuple(row-1, col+1))
+            if self.can_hit_on_cell(tuple(row-1, col-1)):
+                reachable_cells.append(tuple(row-1, col-1))
+
+        return reachable_cells
 
 
 class Rook(Piece):  # Turm
@@ -133,7 +156,54 @@ class Rook(Piece):  # Turm
 
         :return: A list of reachable cells this rook could move into.
         """
-        # TODO: Implement a method that returns all cells this piece can enter in its next move
+        reachable_cells = []
+        row, col = self.cell
+
+       #vertikale Bewegung
+
+        for r in range(row+1, 8):
+        
+            if self.cell_is_valid_and_empty(tuple(r, col)):
+                reachable_cells.append(tuple(r, col))
+            elif self.piece_can_hit_on_cell(tuple(r, col)):
+                reachable_cells.append(tuple(r, col))
+                break
+            else:
+                break
+                
+        for r in reversed(range(0, row)):
+        
+            if self.cell_is_valid_and_empty(tuple(r, col)):
+                reachable_cells.append(tuple(r, col))
+            elif self.piece_can_hit_on_cell(tuple(r, col)):
+                reachable_cells.append(tuple(r, col))
+                break
+            else:
+                break
+
+        #horizontale Bewegung
+
+        for c in reversed(range(0, col)):
+        
+            if self.cell_is_valid_and_empty(tuple(row, c)):
+                reachable_cells.append(tuple(row, c))
+            elif self.piece_can_hit_on_cell(tuple(row, c)):
+                reachable_cells.append(tuple(row, c))
+                break
+            else:
+                break
+        
+        for c in range(col+1, 8):
+        
+            if self.cell_is_valid_and_empty(tuple(row, c)):
+                reachable_cells.append(tuple(row, c))
+            elif self.piece_can_hit_on_cell(tuple(row, c)):
+                reachable_cells.append(tuple(row, c))
+                break
+            else:
+                break
+                
+        return reachable_cells
 
 
 class Knight(Piece):  # Springer
@@ -156,7 +226,38 @@ class Knight(Piece):  # Springer
 
         :return: A list of reachable cells this knight could move into.
         """
-        # TODO: Implement a method that returns all cells this piece can enter in its next move
+        reachable_cells = []
+        row, col = self.cell
+
+        # 'bw' Bewegung
+        if self.can_enter_cell(tuple(row-2, col+1)):
+            reachable_cells.append(tuple(row-2, col+1))
+
+        if self.can_enter_cell(tuple(row-2, col-1)):
+            reachable_cells.append(tuple(row-2, col-1))
+
+        # 'fw' Bewegung
+        if self.can_enter_cell(tuple(row+2, col+1)):
+            reachable_cells.append(tuple(row+2, col+1))
+
+        if self.can_enter_cell(tuple(row+2, col-1)):
+            reachable_cells.append(tuple(row+2, col-1))
+
+        # 'li' Bewegung
+        if self.can_enter_cell(tuple(row+1, col-2)):
+            reachable_cells.append(tuple(row+1, col-2))
+
+        if self.can_enter_cell(tuple(row-1, col-2)):
+            reachable_cells.append(tuple(row-1, col-2))
+
+        # 'rt' Bewegung
+        if self.can_enter_cell(tuple(row+1, col+2)):
+            reachable_cells.append(tuple(row+1, col+2))
+
+        if self.can_enter_cell(tuple(row-1, col+2)):
+            reachable_cells.append(tuple(row-1, col+2))
+
+        return reachable_cells
 
 
 class Bishop(Piece):  # Läufer
@@ -178,7 +279,58 @@ class Bishop(Piece):  # Läufer
 
         :return: A list of reachable cells this bishop could move into.
         """
-        # TODO: Implement a method that returns all cells this piece can enter in its next move
+        reachable_cells = []
+        row, col = self.cell
+
+        # 'fw-rt' Bewegung
+
+        for diagonal_r in range(row+1, 8):
+            col = col + 1
+            if self.cell_is_valid_and_empty(tuple(diagonal_r, col)):
+                reachable_cells.append(tuple(diagonal_r, col))
+            elif self.piece_can_hit_on_cell(tuple(diagonal_r, col)):
+                reachable_cells.append(tuple(diagonal_r, col))
+                break
+            else:
+                break
+
+        # 'bw-rt' Bewegung
+
+        for diagonal_r in reversed(range(0, row)):
+            col = col + 1
+            if self.cell_is_valid_and_empty(tuple(diagonal_r, col)):
+                reachable_cells.append(tuple(diagonal_r, col))
+            elif self.piece_can_hit_on_cell(tuple(diagonal_r, col)):
+                reachable_cells.append(tuple(diagonal_r, col))
+                break
+            else:
+                break
+
+        # 'fw-li' Bewegung
+
+        for diagonal_r in range(row+1, 8):
+            col = col - 1
+            if self.cell_is_valid_and_empty(tuple(diagonal_r, col)):
+                reachable_cells.append(tuple(diagonal_r, col))
+            elif self.piece_can_hit_on_cell(tuple(diagonal_r, col)):
+                reachable_cells.append(tuple(diagonal_r, col))
+                break
+            else:
+                break
+
+        # 'bw-li' Bewegung
+
+        for diagonal_r in reversed(range(0, row)):
+            col = col - 1
+            if self.cell_is_valid_and_empty(tuple(diagonal_r, col)):
+                reachable_cells.append(tuple(diagonal_r, col))
+            elif self.piece_can_hit_on_cell(tuple(diagonal_r, col)):
+                reachable_cells.append(tuple(diagonal_r, col))
+                break
+            else:
+                break
+                
+        return reachable_cells
 
 
 class Queen(Piece):  # Königin
@@ -201,7 +353,102 @@ class Queen(Piece):  # Königin
 
         :return: A list of reachable cells this queen could move into.
         """
-        # TODO: Implement a method that returns all cells this piece can enter in its next move
+        reachable_cells = []
+        row, col = self.cell
+
+        #vertikale Bewegung
+
+        for r in range(row+1, 8):
+        
+            if self.cell_is_valid_and_empty(tuple(r, col)):
+                reachable_cells.append(tuple(r, col))
+            elif self.piece_can_hit_on_cell(tuple(r, col)):
+                reachable_cells.append(tuple(r, col))
+                break
+            else:
+                break
+                
+        for r in reversed(range(0, row)):
+        
+            if self.cell_is_valid_and_empty(tuple(r, col)):
+                reachable_cells.append(tuple(r, col))
+            elif self.piece_can_hit_on_cell(tuple(r, col)):
+                reachable_cells.append(tuple(r, col))
+                break
+            else:
+                break
+
+        #horizontale Bewegung
+
+        for c in reversed(range(0, col)):
+        
+            if self.cell_is_valid_and_empty(tuple(row, c)):
+                reachable_cells.append(tuple(row, c))
+            elif self.piece_can_hit_on_cell(tuple(row, c)):
+                reachable_cells.append(tuple(row, c))
+                break
+            else:
+                break
+        
+        for c in range(col+1, 8):
+        
+            if self.cell_is_valid_and_empty(tuple(row, c)):
+                reachable_cells.append(tuple(row, c))
+            elif self.piece_can_hit_on_cell(tuple(row, c)):
+                reachable_cells.append(tuple(row, c))
+                break
+            else:
+                break
+                
+        # 'fw-rt' Bewegung
+
+        for diagonal_r in range(row+1, 8):
+            col = col + 1
+            if self.cell_is_valid_and_empty(tuple(diagonal_r, col)):
+                reachable_cells.append(tuple(diagonal_r, col))
+            elif self.piece_can_hit_on_cell(tuple(diagonal_r, col)):
+                reachable_cells.append(tuple(diagonal_r, col))
+                break
+            else:
+                break
+
+        # 'bw-rt' Bewegung
+
+        for diagonal_r in reversed(range(0, row)):
+            col = col + 1
+            if self.cell_is_valid_and_empty(tuple(diagonal_r, col)):
+                reachable_cells.append(tuple(diagonal_r, col))
+            elif self.piece_can_hit_on_cell(tuple(diagonal_r, col)):
+                reachable_cells.append(tuple(diagonal_r, col))
+                break
+            else:
+                break
+
+        # 'fw-li' Bewegung
+
+        for diagonal_r in range(row+1, 8):
+            col = col - 1
+            if self.cell_is_valid_and_empty(tuple(diagonal_r, col)):
+                reachable_cells.append(tuple(diagonal_r, col))
+            elif self.piece_can_hit_on_cell(tuple(diagonal_r, col)):
+                reachable_cells.append(tuple(diagonal_r, col))
+                break
+            else:
+                break
+
+        # 'bw-li' Bewegung
+
+        for diagonal_r in reversed(range(0, row)):
+            col = col - 1
+            if self.cell_is_valid_and_empty(tuple(diagonal_r, col)):
+                reachable_cells.append(tuple(diagonal_r, col))
+            elif self.piece_can_hit_on_cell(tuple(diagonal_r, col)):
+                reachable_cells.append(tuple(diagonal_r, col))
+                break
+            else:
+                break
+
+        return reachable_cells
 
 
 class King(Piece):  # König
@@ -223,4 +470,16 @@ class King(Piece):  # König
 
         :return: A list of reachable cells this king could move into.
         """
-        # TODO: Implement a method that returns all cells this piece can enter in its next move
+        reachable_cells = []
+        row, col = self.cell
+
+        #Bewegung im 1-Feld-Abstand + Ausnahme (0,0)
+
+        for i_r in range(-1,2):
+            for i_c in range(-1,2):
+                if i_r == 0 and i_c == 0:
+                    continue
+                if self.can_enter_cell(tuple(row+i_r, col+i_c)):
+                    reachable_cells.append(tuple(row+i_r, col+i_c))
+
+        return reachable_cells
