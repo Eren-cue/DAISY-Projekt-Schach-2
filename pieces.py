@@ -84,7 +84,16 @@ class Piece:
         
         :return: Return True 
         """
-        # TODO: Implement
+        valid_cells = []
+        og_cell = self.cell
+        reachable_cells = self.get_reachable_cells()
+        for cell in reachable_cells:
+            self.board.set_cell(cell, self)
+            if not self.board.is_king_check_cached(self.white):
+                valid_cells.append(cell)
+        self.board.set_cell(og_cell, self)
+        return valid_cells
+            
 
 class Pawn(Piece):  # Bauer
     def __init__(self, board, white):
@@ -114,24 +123,24 @@ class Pawn(Piece):  # Bauer
         row, col = self.cell
 
         if self.white == True:
-            if self.cell_is_valid_and_empty(tuple(row+1, col)):
-                reachable_cells.append(tuple(row+1, col))
-            if row == 1 and self.cell_is_valid_and_empty(tuple(3, col)):
-                reachable_cells.append(tuple(3, col))
-            if self.can_hit_on_cell(tuple(row+1, col+1)):
-                reachable_cells.append(tuple(row+1, col+1))
-            if self.can_hit_on_cell(tuple(row+1, col-1)):
-                reachable_cells.append(tuple(row+1, col-1))
+            if self.board.cell_is_valid_and_empty((row+1, col)):
+                reachable_cells.append((row+1, col))
+            if row == 1 and self.board.cell_is_valid_and_empty((3, col)):
+                reachable_cells.append((3, col))
+            if self.can_hit_on_cell((row+1, col+1)):
+                reachable_cells.append((row+1, col+1))
+            if self.can_hit_on_cell((row+1, col-1)):
+                reachable_cells.append((row+1, col-1))
 
         if self.white == False:
-            if self.cell_is_valid_and_empty(tuple(row-1, col)):
-                reachable_cells.append(tuple(row-1, col))
-            if row == 6 and self.cell_is_valid_and_empty(tuple(4, col)):
-                reachable_cells.append(tuple(4, col))
-            if self.can_hit_on_cell(tuple(row-1, col+1)):
-                reachable_cells.append(tuple(row-1, col+1))
-            if self.can_hit_on_cell(tuple(row-1, col-1)):
-                reachable_cells.append(tuple(row-1, col-1))
+            if self.board.cell_is_valid_and_empty((row-1, col)):
+                reachable_cells.append((row-1, col))
+            if row == 6 and self.board.cell_is_valid_and_empty((4, col)):
+                reachable_cells.append((4, col))
+            if self.can_hit_on_cell((row-1, col+1)):
+                reachable_cells.append((row-1, col+1))
+            if self.can_hit_on_cell((row-1, col-1)):
+                reachable_cells.append((row-1, col-1))
 
         return reachable_cells
 
@@ -163,20 +172,20 @@ class Rook(Piece):  # Turm
 
         for r in range(row+1, 8):
         
-            if self.cell_is_valid_and_empty(tuple(r, col)):
-                reachable_cells.append(tuple(r, col))
-            elif self.piece_can_hit_on_cell(tuple(r, col)):
-                reachable_cells.append(tuple(r, col))
+            if self.board.cell_is_valid_and_empty((r, col)):
+                reachable_cells.append((r, col))
+            elif self.can_hit_on_cell((r, col)):
+                reachable_cells.append((r, col))
                 break
             else:
                 break
                 
         for r in reversed(range(0, row)):
         
-            if self.cell_is_valid_and_empty(tuple(r, col)):
-                reachable_cells.append(tuple(r, col))
-            elif self.piece_can_hit_on_cell(tuple(r, col)):
-                reachable_cells.append(tuple(r, col))
+            if self.board.cell_is_valid_and_empty((r, col)):
+                reachable_cells.append((r, col))
+            elif self.can_hit_on_cell((r, col)):
+                reachable_cells.append((r, col))
                 break
             else:
                 break
@@ -185,20 +194,20 @@ class Rook(Piece):  # Turm
 
         for c in reversed(range(0, col)):
         
-            if self.cell_is_valid_and_empty(tuple(row, c)):
-                reachable_cells.append(tuple(row, c))
-            elif self.piece_can_hit_on_cell(tuple(row, c)):
-                reachable_cells.append(tuple(row, c))
+            if self.board.cell_is_valid_and_empty((row, c)):
+                reachable_cells.append((row, c))
+            elif self.can_hit_on_cell((row, c)):
+                reachable_cells.append((row, c))
                 break
             else:
                 break
         
         for c in range(col+1, 8):
         
-            if self.cell_is_valid_and_empty(tuple(row, c)):
-                reachable_cells.append(tuple(row, c))
-            elif self.piece_can_hit_on_cell(tuple(row, c)):
-                reachable_cells.append(tuple(row, c))
+            if self.board.cell_is_valid_and_empty((row, c)):
+                reachable_cells.append((row, c))
+            elif self.can_hit_on_cell((row, c)):
+                reachable_cells.append((row, c))
                 break
             else:
                 break
@@ -230,32 +239,32 @@ class Knight(Piece):  # Springer
         row, col = self.cell
 
         # 'bw' Bewegung
-        if self.can_enter_cell(tuple(row-2, col+1)):
-            reachable_cells.append(tuple(row-2, col+1))
+        if self.can_enter_cell((row-2, col+1)):
+            reachable_cells.append((row-2, col+1))
 
-        if self.can_enter_cell(tuple(row-2, col-1)):
-            reachable_cells.append(tuple(row-2, col-1))
+        if self.can_enter_cell((row-2, col-1)):
+            reachable_cells.append((row-2, col-1))
 
         # 'fw' Bewegung
-        if self.can_enter_cell(tuple(row+2, col+1)):
-            reachable_cells.append(tuple(row+2, col+1))
+        if self.can_enter_cell((row+2, col+1)):
+            reachable_cells.append((row+2, col+1))
 
-        if self.can_enter_cell(tuple(row+2, col-1)):
-            reachable_cells.append(tuple(row+2, col-1))
+        if self.can_enter_cell((row+2, col-1)):
+            reachable_cells.append((row+2, col-1))
 
         # 'li' Bewegung
-        if self.can_enter_cell(tuple(row+1, col-2)):
-            reachable_cells.append(tuple(row+1, col-2))
+        if self.can_enter_cell((row+1, col-2)):
+            reachable_cells.append((row+1, col-2))
 
-        if self.can_enter_cell(tuple(row-1, col-2)):
-            reachable_cells.append(tuple(row-1, col-2))
+        if self.can_enter_cell((row-1, col-2)):
+            reachable_cells.append((row-1, col-2))
 
         # 'rt' Bewegung
-        if self.can_enter_cell(tuple(row+1, col+2)):
-            reachable_cells.append(tuple(row+1, col+2))
+        if self.can_enter_cell((row+1, col+2)):
+            reachable_cells.append((row+1, col+2))
 
-        if self.can_enter_cell(tuple(row-1, col+2)):
-            reachable_cells.append(tuple(row-1, col+2))
+        if self.can_enter_cell((row-1, col+2)):
+            reachable_cells.append((row-1, col+2))
 
         return reachable_cells
 
@@ -286,10 +295,10 @@ class Bishop(Piece):  # Läufer
 
         for diagonal_r in range(row+1, 8):
             col = col + 1
-            if self.cell_is_valid_and_empty(tuple(diagonal_r, col)):
-                reachable_cells.append(tuple(diagonal_r, col))
-            elif self.piece_can_hit_on_cell(tuple(diagonal_r, col)):
-                reachable_cells.append(tuple(diagonal_r, col))
+            if self.board.cell_is_valid_and_empty((diagonal_r, col)):
+                reachable_cells.append((diagonal_r, col))
+            elif self.can_hit_on_cell((diagonal_r, col)):
+                reachable_cells.append((diagonal_r, col))
                 break
             else:
                 break
@@ -298,10 +307,10 @@ class Bishop(Piece):  # Läufer
 
         for diagonal_r in reversed(range(0, row)):
             col = col + 1
-            if self.cell_is_valid_and_empty(tuple(diagonal_r, col)):
-                reachable_cells.append(tuple(diagonal_r, col))
-            elif self.piece_can_hit_on_cell(tuple(diagonal_r, col)):
-                reachable_cells.append(tuple(diagonal_r, col))
+            if self.board.cell_is_valid_and_empty((diagonal_r, col)):
+                reachable_cells.append((diagonal_r, col))
+            elif self.can_hit_on_cell((diagonal_r, col)):
+                reachable_cells.append((diagonal_r, col))
                 break
             else:
                 break
@@ -310,10 +319,10 @@ class Bishop(Piece):  # Läufer
 
         for diagonal_r in range(row+1, 8):
             col = col - 1
-            if self.cell_is_valid_and_empty(tuple(diagonal_r, col)):
-                reachable_cells.append(tuple(diagonal_r, col))
-            elif self.piece_can_hit_on_cell(tuple(diagonal_r, col)):
-                reachable_cells.append(tuple(diagonal_r, col))
+            if self.board.cell_is_valid_and_empty((diagonal_r, col)):
+                reachable_cells.append((diagonal_r, col))
+            elif self.can_hit_on_cell((diagonal_r, col)):
+                reachable_cells.append((diagonal_r, col))
                 break
             else:
                 break
@@ -322,10 +331,10 @@ class Bishop(Piece):  # Läufer
 
         for diagonal_r in reversed(range(0, row)):
             col = col - 1
-            if self.cell_is_valid_and_empty(tuple(diagonal_r, col)):
-                reachable_cells.append(tuple(diagonal_r, col))
-            elif self.piece_can_hit_on_cell(tuple(diagonal_r, col)):
-                reachable_cells.append(tuple(diagonal_r, col))
+            if self.board.cell_is_valid_and_empty((diagonal_r, col)):
+                reachable_cells.append((diagonal_r, col))
+            elif self.can_hit_on_cell((diagonal_r, col)):
+                reachable_cells.append((diagonal_r, col))
                 break
             else:
                 break
@@ -360,20 +369,20 @@ class Queen(Piece):  # Königin
 
         for r in range(row+1, 8):
         
-            if self.cell_is_valid_and_empty(tuple(r, col)):
-                reachable_cells.append(tuple(r, col))
-            elif self.piece_can_hit_on_cell(tuple(r, col)):
-                reachable_cells.append(tuple(r, col))
+            if self.board.cell_is_valid_and_empty((r, col)):
+                reachable_cells.append((r, col))
+            elif self.can_hit_on_cell((r, col)):
+                reachable_cells.append((r, col))
                 break
             else:
                 break
                 
         for r in reversed(range(0, row)):
         
-            if self.cell_is_valid_and_empty(tuple(r, col)):
-                reachable_cells.append(tuple(r, col))
-            elif self.piece_can_hit_on_cell(tuple(r, col)):
-                reachable_cells.append(tuple(r, col))
+            if self.board.cell_is_valid_and_empty((r, col)):
+                reachable_cells.append((r, col))
+            elif self.can_hit_on_cell((r, col)):
+                reachable_cells.append((r, col))
                 break
             else:
                 break
@@ -382,20 +391,20 @@ class Queen(Piece):  # Königin
 
         for c in reversed(range(0, col)):
         
-            if self.cell_is_valid_and_empty(tuple(row, c)):
-                reachable_cells.append(tuple(row, c))
-            elif self.piece_can_hit_on_cell(tuple(row, c)):
-                reachable_cells.append(tuple(row, c))
+            if self.board.cell_is_valid_and_empty((row, c)):
+                reachable_cells.append((row, c))
+            elif self.can_hit_on_cell((row, c)):
+                reachable_cells.append((row, c))
                 break
             else:
                 break
         
         for c in range(col+1, 8):
         
-            if self.cell_is_valid_and_empty(tuple(row, c)):
-                reachable_cells.append(tuple(row, c))
-            elif self.piece_can_hit_on_cell(tuple(row, c)):
-                reachable_cells.append(tuple(row, c))
+            if self.board.cell_is_valid_and_empty((row, c)):
+                reachable_cells.append((row, c))
+            elif self.can_hit_on_cell((row, c)):
+                reachable_cells.append((row, c))
                 break
             else:
                 break
@@ -404,10 +413,10 @@ class Queen(Piece):  # Königin
 
         for diagonal_r in range(row+1, 8):
             col = col + 1
-            if self.cell_is_valid_and_empty(tuple(diagonal_r, col)):
-                reachable_cells.append(tuple(diagonal_r, col))
-            elif self.piece_can_hit_on_cell(tuple(diagonal_r, col)):
-                reachable_cells.append(tuple(diagonal_r, col))
+            if self.board.cell_is_valid_and_empty((diagonal_r, col)):
+                reachable_cells.append((diagonal_r, col))
+            elif self.can_hit_on_cell((diagonal_r, col)):
+                reachable_cells.append((diagonal_r, col))
                 break
             else:
                 break
@@ -416,10 +425,10 @@ class Queen(Piece):  # Königin
 
         for diagonal_r in reversed(range(0, row)):
             col = col + 1
-            if self.cell_is_valid_and_empty(tuple(diagonal_r, col)):
-                reachable_cells.append(tuple(diagonal_r, col))
-            elif self.piece_can_hit_on_cell(tuple(diagonal_r, col)):
-                reachable_cells.append(tuple(diagonal_r, col))
+            if self.board.cell_is_valid_and_empty((diagonal_r, col)):
+                reachable_cells.append((diagonal_r, col))
+            elif self.can_hit_on_cell((diagonal_r, col)):
+                reachable_cells.append((diagonal_r, col))
                 break
             else:
                 break
@@ -428,10 +437,10 @@ class Queen(Piece):  # Königin
 
         for diagonal_r in range(row+1, 8):
             col = col - 1
-            if self.cell_is_valid_and_empty(tuple(diagonal_r, col)):
-                reachable_cells.append(tuple(diagonal_r, col))
-            elif self.piece_can_hit_on_cell(tuple(diagonal_r, col)):
-                reachable_cells.append(tuple(diagonal_r, col))
+            if self.board.cell_is_valid_and_empty((diagonal_r, col)):
+                reachable_cells.append((diagonal_r, col))
+            elif self.can_hit_on_cell((diagonal_r, col)):
+                reachable_cells.append((diagonal_r, col))
                 break
             else:
                 break
@@ -440,10 +449,10 @@ class Queen(Piece):  # Königin
 
         for diagonal_r in reversed(range(0, row)):
             col = col - 1
-            if self.cell_is_valid_and_empty(tuple(diagonal_r, col)):
-                reachable_cells.append(tuple(diagonal_r, col))
-            elif self.piece_can_hit_on_cell(tuple(diagonal_r, col)):
-                reachable_cells.append(tuple(diagonal_r, col))
+            if self.board.cell_is_valid_and_empty((diagonal_r, col)):
+                reachable_cells.append((diagonal_r, col))
+            elif self.can_hit_on_cell((diagonal_r, col)):
+                reachable_cells.append((diagonal_r, col))
                 break
             else:
                 break
@@ -479,7 +488,7 @@ class King(Piece):  # König
             for i_c in range(-1,2):
                 if i_r == 0 and i_c == 0:
                     continue
-                if self.can_enter_cell(tuple(row+i_r, col+i_c)):
-                    reachable_cells.append(tuple(row+i_r, col+i_c))
+                if self.can_enter_cell((row+i_r, col+i_c)):
+                    reachable_cells.append((row+i_r, col+i_c))
 
         return reachable_cells

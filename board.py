@@ -292,12 +292,12 @@ class Board(BoardBase):
         being within the allowed range (0 to 7 inclusively).
         Don´t forget to handle the special case of "cell" being None. Return False in that case
         """
-        row, col = cell
-
         if cell is None:
             return False
+
+        row, col = cell
     
-        elif row < 0 or row > 7:
+        if row < 0 or row > 7:
             return False
         
         elif col < 0 or col > 7:
@@ -336,12 +336,11 @@ class Board(BoardBase):
         If, however, there is another piece, it must be of opposing color. Check the other pieces "white" attribute and compare against
         the given piece "white" attribute.
         """
-        if self.cell_is_valid_and_empty(cell):
-            return True
-        
-        elif self.get_cell(cell).is_white() is not piece.is_white():
-            return True
-    
+        if self.is_valid_cell(cell):
+            if self.get_cell(cell) is None:
+                return True
+            elif piece.white is not self.get_cell(cell).white:
+                return True
         else:
             return False
  
@@ -363,7 +362,7 @@ class Board(BoardBase):
         """
         if self.is_valid_cell(cell):
             if self.get_cell(cell) is not None:
-                if self.get_cell().is_white() is not piece.is_white():
+                if self.get_cell(cell).is_white() is not piece.is_white():
                     return True
     
         else:
