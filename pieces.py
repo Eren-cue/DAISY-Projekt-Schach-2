@@ -292,49 +292,49 @@ class Bishop(Piece):  # Läufer
         row, col = self.cell
 
         # 'fw-rt' Bewegung
-
+        cols = col
         for diagonal_r in range(row+1, 8):
-            col = col + 1
-            if self.board.cell_is_valid_and_empty((diagonal_r, col)):
-                reachable_cells.append((diagonal_r, col))
-            elif self.can_hit_on_cell((diagonal_r, col)):
-                reachable_cells.append((diagonal_r, col))
+            cols = cols + 1
+            if self.board.cell_is_valid_and_empty((diagonal_r, cols)):
+                reachable_cells.append((diagonal_r, cols))
+            elif self.can_hit_on_cell((diagonal_r, cols)):
+                reachable_cells.append((diagonal_r, cols))
                 break
             else:
                 break
 
         # 'bw-rt' Bewegung
-
+        cols = col
         for diagonal_r in reversed(range(0, row)):
-            col = col + 1
-            if self.board.cell_is_valid_and_empty((diagonal_r, col)):
-                reachable_cells.append((diagonal_r, col))
-            elif self.can_hit_on_cell((diagonal_r, col)):
-                reachable_cells.append((diagonal_r, col))
+            cols = cols + 1
+            if self.board.cell_is_valid_and_empty((diagonal_r, cols)):
+                reachable_cells.append((diagonal_r, cols))
+            elif self.can_hit_on_cell((diagonal_r, cols)):
+                reachable_cells.append((diagonal_r, cols))
                 break
             else:
                 break
 
         # 'fw-li' Bewegung
-
+        cols = col
         for diagonal_r in range(row+1, 8):
-            col = col - 1
-            if self.board.cell_is_valid_and_empty((diagonal_r, col)):
-                reachable_cells.append((diagonal_r, col))
-            elif self.can_hit_on_cell((diagonal_r, col)):
-                reachable_cells.append((diagonal_r, col))
+            cols = cols - 1
+            if self.board.cell_is_valid_and_empty((diagonal_r, cols)):
+                reachable_cells.append((diagonal_r, cols))
+            elif self.can_hit_on_cell((diagonal_r, cols)):
+                reachable_cells.append((diagonal_r, cols))
                 break
             else:
                 break
 
         # 'bw-li' Bewegung
-
+        cols = col
         for diagonal_r in reversed(range(0, row)):
-            col = col - 1
-            if self.board.cell_is_valid_and_empty((diagonal_r, col)):
-                reachable_cells.append((diagonal_r, col))
-            elif self.can_hit_on_cell((diagonal_r, col)):
-                reachable_cells.append((diagonal_r, col))
+            cols = cols - 1
+            if self.board.cell_is_valid_and_empty((diagonal_r, cols)):
+                reachable_cells.append((diagonal_r, cols))
+            elif self.can_hit_on_cell((diagonal_r, cols)):
+                reachable_cells.append((diagonal_r, cols))
                 break
             else:
                 break
@@ -410,49 +410,49 @@ class Queen(Piece):  # Königin
                 break
                 
         # 'fw-rt' Bewegung
-
+        cols = col
         for diagonal_r in range(row+1, 8):
-            col = col + 1
-            if self.board.cell_is_valid_and_empty((diagonal_r, col)):
-                reachable_cells.append((diagonal_r, col))
-            elif self.can_hit_on_cell((diagonal_r, col)):
-                reachable_cells.append((diagonal_r, col))
+            cols = cols + 1
+            if self.board.cell_is_valid_and_empty((diagonal_r, cols)):
+                reachable_cells.append((diagonal_r, cols))
+            elif self.can_hit_on_cell((diagonal_r, cols)):
+                reachable_cells.append((diagonal_r, cols))
                 break
             else:
                 break
 
         # 'bw-rt' Bewegung
-
+        cols = col
         for diagonal_r in reversed(range(0, row)):
-            col = col + 1
-            if self.board.cell_is_valid_and_empty((diagonal_r, col)):
-                reachable_cells.append((diagonal_r, col))
-            elif self.can_hit_on_cell((diagonal_r, col)):
-                reachable_cells.append((diagonal_r, col))
+            cols = cols + 1
+            if self.board.cell_is_valid_and_empty((diagonal_r, cols)):
+                reachable_cells.append((diagonal_r, cols))
+            elif self.can_hit_on_cell((diagonal_r, cols)):
+                reachable_cells.append((diagonal_r, cols))
                 break
             else:
                 break
 
         # 'fw-li' Bewegung
-
+        cols = col
         for diagonal_r in range(row+1, 8):
-            col = col - 1
-            if self.board.cell_is_valid_and_empty((diagonal_r, col)):
-                reachable_cells.append((diagonal_r, col))
-            elif self.can_hit_on_cell((diagonal_r, col)):
-                reachable_cells.append((diagonal_r, col))
+            cols = cols - 1
+            if self.board.cell_is_valid_and_empty((diagonal_r, cols)):
+                reachable_cells.append((diagonal_r, cols))
+            elif self.can_hit_on_cell((diagonal_r, cols)):
+                reachable_cells.append((diagonal_r, cols))
                 break
             else:
                 break
 
         # 'bw-li' Bewegung
-
+        cols = col
         for diagonal_r in reversed(range(0, row)):
-            col = col - 1
-            if self.board.cell_is_valid_and_empty((diagonal_r, col)):
-                reachable_cells.append((diagonal_r, col))
-            elif self.can_hit_on_cell((diagonal_r, col)):
-                reachable_cells.append((diagonal_r, col))
+            cols = cols - 1
+            if self.board.cell_is_valid_and_empty((diagonal_r, cols)):
+                reachable_cells.append((diagonal_r, cols))
+            elif self.can_hit_on_cell((diagonal_r, cols)):
+                reachable_cells.append((diagonal_r, cols))
                 break
             else:
                 break
