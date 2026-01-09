@@ -125,8 +125,8 @@ class Pawn(Piece):  # Bauer
         if self.white == True:
             if self.board.cell_is_valid_and_empty((row+1, col)):
                 reachable_cells.append((row+1, col))
-            if row == 1 and self.board.cell_is_valid_and_empty((3, col)):
-                reachable_cells.append((3, col))
+                if row == 1 and self.board.cell_is_valid_and_empty((3, col)):
+                    reachable_cells.append((3, col))
             if self.can_hit_on_cell((row+1, col+1)):
                 reachable_cells.append((row+1, col+1))
             if self.can_hit_on_cell((row+1, col-1)):
@@ -135,8 +135,8 @@ class Pawn(Piece):  # Bauer
         if self.white == False:
             if self.board.cell_is_valid_and_empty((row-1, col)):
                 reachable_cells.append((row-1, col))
-            if row == 6 and self.board.cell_is_valid_and_empty((4, col)):
-                reachable_cells.append((4, col))
+                if row == 6 and self.board.cell_is_valid_and_empty((4, col)):
+                    reachable_cells.append((4, col))
             if self.can_hit_on_cell((row-1, col+1)):
                 reachable_cells.append((row-1, col+1))
             if self.can_hit_on_cell((row-1, col-1)):
