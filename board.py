@@ -229,6 +229,13 @@ class Board(BoardBase):
         super().__init__()
 
     def iterate_cells_with_pieces(self, white):
+
+        for row in range(8):
+            for col in range(8):
+                occupant = self.get_cell((row,col))
+                if occupant != None and piece.is_white(occupant) == white:
+                    yield self.cells[row][col]
+
         """
         **TODO**: Write a generator (using the yield keyword) that allows to iterate
         over all cells with a piece of given color.
@@ -243,6 +250,17 @@ class Board(BoardBase):
         # TODO: Implement
 
     def find_king(self, white):
+
+        while True:
+            piece_team = self.iterate_cells_with_pieces(white)
+            if piece_team.isinstance(King):
+                return piece_team
+
+            else:
+                continue
+                
+        # automatisch return None, wenn no King on the board
+        
         """
         **TODO**: Find the king piece of given color and return that piece
 
@@ -257,6 +275,26 @@ class Board(BoardBase):
         # TODO: Implement
 
     def is_king_check(self, white):
+
+        king_cell = self.find_king(white)       #Speichert die Zelle des Koenigs
+
+        while True:
+            #Iteriert ueber die Zellen und yielded be jedem aufrufen eine gegnerische Figur
+            opponent = self.iterate_cells_with_pieces(not white)
+            #While Schleife besteht solange es Gegner gibt
+            if opponent is None:
+                break
+            #Holt die moeglichen Zuege der Gegnerischen Figur
+            possible_moves_op = opponent.get_reachable_cells()
+            #Wenn die Zelle des Koenigs in der Liste der moeglichen Zuege ist returned er True
+            if king_cell in possible_moves_op:
+                return True
+            #Wenn nicht in der Liste der Zuege weiter mit der naechsten gegnerischen Figur    
+            else:
+                continue
+        #Wenn keiner der gegnerischen Figuren den Koenig erreichen kann wird False returned        
+        return False
+    
         """
         **TODO**: Evaluate if the king of given color is currently in check.
         A check is given if any opposing piece can beat the king in its next move.
