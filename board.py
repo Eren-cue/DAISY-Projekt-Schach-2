@@ -233,7 +233,7 @@ class Board(BoardBase):
         for row in range(8):
             for col in range(8):
                 occupant = self.get_cell((row,col))
-                if occupant != None and piece.is_white(occupant) == white:
+                if occupant not None and self.piece.is_white(occupant) == white:
                     yield self.cells[row][col]
 
         """
@@ -260,7 +260,7 @@ class Board(BoardBase):
                 continue
                 
         # automatisch return None, wenn no King on the board
-        
+
         """
         **TODO**: Find the king piece of given color and return that piece
 
