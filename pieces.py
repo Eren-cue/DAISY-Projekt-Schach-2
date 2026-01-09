@@ -88,10 +88,12 @@ class Piece:
         og_cell = self.cell
         reachable_cells = self.get_reachable_cells()
         for cell in reachable_cells:
+            enemy = self.board.get_cell(cell)
             self.board.set_cell(cell, self)
             if not self.board.is_king_check_cached(self.white):
                 valid_cells.append(cell)
-        self.board.set_cell(og_cell, self)
+                self.board.set_cell(og_cell, self)
+            self.board.set_cell(cell, enemy)
         return valid_cells
             
 
