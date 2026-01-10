@@ -92,8 +92,9 @@ class Piece:
             self.board.set_cell(cell, self)
             if not self.board.is_king_check_cached(self.white):
                 valid_cells.append(cell)
-                self.board.set_cell(og_cell, self)
+            self.board.set_cell(og_cell, self)
             self.board.set_cell(cell, enemy)
+        self.board.set_cell(og_cell, self)
         return valid_cells
             
 

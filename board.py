@@ -274,19 +274,9 @@ class Board(BoardBase):
 
     def is_king_check(self, white):
 
-        king_cell = self.find_king(white)       #Speichert die Zelle des Koenigs
-        '''
-        for opponent in self.iterate_cells_with_pieces(not white):
-
-            possible_moves_op = opponent.get_reachable_cells()
-
-            if king_cell in possible_moves_op:
-                return True
-        
-        return False'''
+        king_cell = tuple(self.find_king(white).cell)    #Speichert die Zelle des Koenigs
     
         for opponent in self.iterate_cells_with_pieces(not white):
-
             possible_moves_op = opponent.get_reachable_cells()
 
             for move in possible_moves_op:
