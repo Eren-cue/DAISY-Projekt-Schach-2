@@ -251,11 +251,11 @@ class Board(BoardBase):
     def find_king(self, white):
 
         for piece in self.iterate_cells_with_pieces(white):
-            
+
             if isinstance(piece, King):
                 return piece
 
-        return None        
+      
         # automatisch return None, wenn no King on the board
 
         """
@@ -271,19 +271,19 @@ class Board(BoardBase):
         """
 
     def is_king_check(self, white):
+        if self.find_king is not None:
+            king_cell = tuple(self.find_king(white).cell)    #Speichert die Zelle des Koenigs
 
-        king_cell = tuple(self.find_king(white).cell)    #Speichert die Zelle des Koenigs
-    
-        for opponent in self.iterate_cells_with_pieces(not white):
-            possible_moves_op = opponent.get_reachable_cells()
+            for opponent in self.iterate_cells_with_pieces(not white):
+                possible_moves_op = opponent.get_reachable_cells()
 
-            for move in possible_moves_op:
+                for move in possible_moves_op:
 
-                if move == king_cell:
-                    return True
-        
-        return False
-    
+                    if move == king_cell:
+                        return True
+            
+            return False
+
         """
         **TODO**: Evaluate if the king of given color is currently in check.
         A check is given if any opposing piece can beat the king in its next move.
