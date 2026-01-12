@@ -75,20 +75,33 @@ class Piece:
         points = base_pts
         
         # Für jede gegnerische Figur wird evaluate ausgeführt und dieser Wert der Figur hinzugefügt
-        reachable_cells = self.get_reachable_cells()
-        for enemy in self.board.iterate_cells_with_pieces(not self.white):
-            for cell in reachable_cells:
-                if cell == tuple(enemy.cell):
-                    enemy_base_pts = 0
-                    if isinstance(enemy, Pawn):
-                        base_pts = 1
-                    elif isinstance(enemy, Knight) or isinstance(self, Bishop):
-                        base_pts = 3
-                    elif isinstance(enemy, Rook):
-                        base_pts = 5
-                    elif isinstance(enemy, Queen):
-                        base_pts = 9
-                    points += enemy_base_pts
+        position = self.cell
+        check_factor = 1
+        valid_cells = self.get_valid_cells()
+        for cell in valid_cells:
+            enemy = self.board.get_cell(cell)
+            if enemy is not None:
+                
+                if isinstance(enemy, Pawn):
+                    enemy_base_pts = 1
+                elif isinstance(enemy, Knight) or isinstance(self, Bishop):
+                    enemy_base_pts = 3
+                elif isinstance(enemy, Rook):
+                    enemy_base_pts = 5
+                elif isinstance(enemy, Queen):
+                    enemy_base_pts = 9
+
+                points += enemy_base_pts
+
+            self.board.set_cell(cell, self)
+            
+            if self.board.king_is_check(not self.white):
+                check_factor += 0.5                  # erhoeht den score fuer jeden naechsten Zug der den gegnerischen Koenig ins Schach setzt 
+            
+            self.board.set_cell(position, self)
+            self.board.set_cell(cell, enemy)
+
+
 
         row, col = self.cell
 
@@ -102,7 +115,7 @@ class Piece:
         elif (row == 3 or row == 4) and (col == 3 or col == 4):
             factor = 1
         
-        final_points = points * factor
+        final_points = points * factor * check_factor
         return final_points
     
 
