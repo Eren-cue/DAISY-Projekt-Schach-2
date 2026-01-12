@@ -93,7 +93,26 @@ def evaluate_all_possible_moves(board, minMaxArg, maximumNumberOfMoves = 10):
     After sorting, a maximum number of moves as provided by the respective parameter must be returned. If there are 
     more moves possible (in most situations there are), only return the top (or worst). Hint: Slice the list after sorting. 
     """
-    # TODO: Implement the method according to the above description
+    color = minMaxArg.playAsWhite # True = White, False = Black
+    list_moves = []
+    for piece in board.iterate_cells_with_pieces(color):
+        og_cell = piece.cell
+        moves = piece.get_valid_cells()
+        for move in moves:
+            occupant = board.get_cell(move)
+            board.set_cell(move, piece)
+            points = board.evaluate()
+
+            list_moves.append(Move(piece, move, points))
+            if color:
+                list_moves.sort(reverse=True, key=lambda x: x.score)
+            else:
+                list_moves.sort(reverse=False, key=lambda x: x.score)
+
+            board.set_cell(og_cell, piece)
+            board.set_cell(move, occupant)
+    list_moves = list_moves[:maximumNumberOfMoves]
+    return list_moves
 
 
 def minMax(board, minMaxArg):

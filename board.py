@@ -247,7 +247,6 @@ class Board(BoardBase):
         :param white: True if WHITE pieces are to be iterated, False otherwise
         :type white: Boolean
         """
-        # TODO: Implement
 
     def find_king(self, white):
 
@@ -270,7 +269,6 @@ class Board(BoardBase):
 
         :return: The :py:class:'King': object of the given color or None if there is no King on the board.
         """
-        # TODO: Implement
 
     def is_king_check(self, white):
 
@@ -307,8 +305,11 @@ class Board(BoardBase):
         Use the iterate_cells_with_pieces Method to find all WHITE pieces and call their respective "evaluate" Method. Sum those scores up.
         Then use the iterate_cells_with_pieces Method to find all BLACK pieces, call their respective "evaluate" Method and substract that from the score.
         """
-        # TODO: Implement
         score = 0.0
+        for white_piece in self.iterate_cells_with_pieces(True):
+            score += white_piece.evaluate()
+        for black_piece in self.iterate_cells_with_pieces(False):
+            score -= black_piece.evaluate()
         return score
 
     def is_valid_cell(self, cell):

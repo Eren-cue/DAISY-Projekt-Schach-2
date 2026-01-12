@@ -60,7 +60,51 @@ class Piece:
         
         :return: Return numerical score between -infinity and +infinity. Greater values indicate better evaluation result (more favorable).
         """
-        # TODO: Implement
+        base_pts = 0
+        if isinstance(self, Pawn):
+            base_pts = 1
+        elif isinstance(self, Knight) or isinstance(self, Bishop):
+            base_pts = 3
+        elif isinstance(self, Rook):
+            base_pts = 5
+        elif isinstance(self, Queen):
+            base_pts = 9
+        elif base_pts == 0:
+            return 0
+        
+        points = base_pts
+        
+        # Für jede gegnerische Figur wird evaluate ausgeführt und dieser Wert der Figur hinzugefügt
+        reachable_cells = self.get_reachable_cells()
+        for enemy in self.board.iterate_cells_with_pieces(not self.white):
+            for cell in reachable_cells:
+                if cell == tuple(enemy.cell):
+                    enemy_base_pts = 0
+                    if isinstance(enemy, Pawn):
+                        base_pts = 1
+                    elif isinstance(enemy, Knight) or isinstance(self, Bishop):
+                        base_pts = 3
+                    elif isinstance(enemy, Rook):
+                        base_pts = 5
+                    elif isinstance(enemy, Queen):
+                        base_pts = 9
+                    points += enemy_base_pts
+
+        row, col = self.cell
+
+        # Alle rows und cols durchgehen und überprüfen auf welchem ring er steht
+        if (row == 0 or row == 7) or (col == 0 or col == 7):
+            factor = 0.70 
+        elif (row == 1 or row == 6) or (col == 1 or col == 6):
+            factor = 0.80
+        elif (row == 2 or row == 5) or (col == 2 or col == 5):
+            factor = 0.90
+        elif (row == 3 or row == 4) and (col == 3 or col == 4):
+            factor = 1
+        
+        final_points = points * factor
+        return final_points
+    
 
     def get_valid_cells(self):
         """
