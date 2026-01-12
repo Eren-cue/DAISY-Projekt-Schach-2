@@ -95,7 +95,7 @@ class Piece:
 
             self.board.set_cell(cell, self)
             
-            if self.board.king_is_check(not self.white):
+            if self.board.is_king_check(not self.white):
                 check_factor += 0.5                  # erhoeht den score fuer jeden naechsten Zug der den gegnerischen Koenig ins Schach setzt 
             
             self.board.set_cell(position, self)
