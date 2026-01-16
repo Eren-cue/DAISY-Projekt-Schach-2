@@ -208,6 +208,7 @@ def minMax(board, minMaxArg):
 
         best_three_moves = all_evaluated_moves[:3]
         return random.choice(best_three_moves)
+        # return all_evaluated_moves[0] # ohne random moves
 
     
 

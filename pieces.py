@@ -62,15 +62,15 @@ class Piece:
         """
         base_pts = 0
         if isinstance(self, Pawn):
-            base_pts = 10
+            base_pts = 1
         elif isinstance(self, Knight) or isinstance(self, Bishop):
-            base_pts = 30
+            base_pts = 3
         elif isinstance(self, Rook):
-            base_pts = 50
+            base_pts = 5
         elif isinstance(self, Queen):
-            base_pts = 90
+            base_pts = 9
         elif isinstance(self, King):
-            base_pts = 999999
+            base_pts = 20
         elif base_pts == 0:
             return 0
         
@@ -81,7 +81,6 @@ class Piece:
         valid_cells = self.get_valid_cells()
         for cell in valid_cells:
             enemy_base_pts = 0
-            position_pts = 0
             occupant = self.board.get_cell(cell)
             if occupant is not None:
                 if isinstance(occupant, Pawn):
@@ -93,9 +92,9 @@ class Piece:
                 elif isinstance(occupant, Queen):
                     enemy_base_pts = 9
                 elif isinstance(occupant, King):
-                    enemy_base_pts = 99999
+                    enemy_base_pts = 20
             
-                points += enemy_base_pts / 2
+                points += enemy_base_pts / 10
             
 
 
@@ -104,17 +103,16 @@ class Piece:
 
         #Alle rows und cols durchgehen und überprüfen auf welchem ring er steht
         if (row == 0 or row == 7) or (col == 0 or col == 7):
-            factor = 0.85
+            factor = 0.94
         elif (row == 1 or row == 6) or (col == 1 or col == 6):
-            factor = 0.90
+            factor = 0.96
         elif (row == 2 or row == 5) or (col == 2 or col == 5):
-            factor = 0.95
+            factor = 0.98
         elif (row == 3 or row == 4) and (col == 3 or col == 4):
             factor = 1
         
         final_points = points * factor 
         return final_points
-    
 
     def get_valid_cells(self):
         """
