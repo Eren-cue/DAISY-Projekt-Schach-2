@@ -183,6 +183,40 @@ def minMax(board, minMaxArg):
     """
     # TODO: Implement the Mini-Max algorithm
 
+    # In engine.py
+    possible_moves = evaluate_all_possible_moves(board,minMaxArg) #is sorted
+    if not evaluate_all_possible_moves:
+        if minMaxArg.playAsWhite: # if king dead 
+            return Move(None,None,-99999)
+        else:
+            return Move(None,None,999999)
+    if minMaxArg.depth <=1: #stop
+        return possible_moves[0] 
+    
+    next_depth = minMaxArg.next() # depth -1 and switch player
+    for move in possible_moves:
+        #remeber positioning for reset
+        active_piece = move.piece   
+        start_pos = active_piece.cell 
+        dest_pos = move.cell
+        captured = board.get_cell(dest_pos) 
+
+        board.set_cell(dest_pos, active_piece)# virtuall move
+        enemyresponse = minMax_cached(board, next_depth)
+        move.score = enemyresponse.score
+        board.set_cell(start_pos, active_piece) # clear all virtuall moves
+        board.set_cell(dest_pos, captured)
+
+    if minMaxArg.playAsWhite: #sort
+        possible_moves.sort(key=lambda x: x.score, reverse=True) # true white biggest number first
+    else:
+        possible_moves.sort(key=lambda x: x.score, reverse=False) #false black lowest number first
+    return possible_moves[0]
+
+
+
+
+    
 
 def suggest_random_move(board):
     """
