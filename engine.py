@@ -257,7 +257,19 @@ def suggest_random_move(board):
 
     If there are no legal moves at all, return None.
     """
-    # TODO: Implement a valid random move
+    moveable_pieces = []
+    for piece in board.iterate_cells_with_pieces(True):
+        if len(piece.get_valid_cells()) != 0:
+            moveable_pieces.append(piece)
+    
+    if len(moveable_pieces) == 0:
+        return None
+    
+    else:
+        rdm_piece = random.choice(moveable_pieces)
+        rdm_move = random.choice(rdm_piece.get_valid_cells())
+
+        return Move(rdm_piece, rdm_move, 1)
 
 
 
