@@ -193,54 +193,21 @@ def minMax(board, minMaxArg):
     
     if minMaxArg.depth > 1:
         for move in all_evaluated_moves:
-            og_cell = move.piece.cell
+            active_piece = move.piece
+            og_cell = active_piece.cell
             occupant = board.get_cell(move.cell)
-            occupant_cell = move.cell
-            minMax_score = minMax_cached(board, minMaxArg.next())
-            move = Move(move.piece, move.cell, minMax_score)
-            board.set_cell(og_cell, move.piece)
-            board.set_cell(occupant_cell, occupant)
+            board.set_cell(move.cell, active_piece)
+            move.score = minMax_cached(board, minMaxArg.next()).score
+            board.set_cell(og_cell, active_piece)
+            board.set_cell(move.cell, occupant)
             
         if minMaxArg.playAsWhite:
             all_evaluated_moves.sort(reverse=True, key=lambda x: x.score)
         else:
             all_evaluated_moves.sort(reverse=False, key=lambda x: x.score)
 
-
-        return all_evaluated_moves[0]
-
-    # In engine.py
-    possible_moves = evaluate_all_possible_moves(board,minMaxArg) #is sorted
-    if not evaluate_all_possible_moves:
-        if minMaxArg.playAsWhite: # if king dead 
-            return Move(None,None,-99999)
-        else:
-            return Move(None,None,999999)
-    if minMaxArg.depth <=1: #stop
-        return possible_moves[0] 
-    
-    next_depth = minMaxArg.next() # depth -1 and switch player
-    for move in possible_moves:
-        #remeber positioning for reset
-        active_piece = move.piece   
-        start_pos = active_piece.cell 
-        dest_pos = move.cell
-        captured = board.get_cell(dest_pos) 
-
-        board.set_cell(dest_pos, active_piece)# virtuall move
-        enemyresponse = minMax_cached(board, next_depth)
-        move.score = enemyresponse.score
-        board.set_cell(start_pos, active_piece) # clear all virtuall moves
-        board.set_cell(dest_pos, captured)
-
-    if minMaxArg.playAsWhite: #sort
-        possible_moves.sort(key=lambda x: x.score, reverse=True) # true white biggest number first
-    else:
-        possible_moves.sort(key=lambda x: x.score, reverse=False) #false black lowest number first
-    return possible_moves[0]
-
-
-
+        best_three_moves = all_evaluated_moves[:3]
+        return random.choice(best_three_moves)
 
     
 

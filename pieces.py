@@ -62,99 +62,58 @@ class Piece:
         """
         base_pts = 0
         if isinstance(self, Pawn):
-            base_pts = 1
+            base_pts = 10
         elif isinstance(self, Knight) or isinstance(self, Bishop):
-            base_pts = 3
+            base_pts = 30
         elif isinstance(self, Rook):
-            base_pts = 5
+            base_pts = 50
         elif isinstance(self, Queen):
-            base_pts = 9
-        # elif isinstance(self, King):
-        #     base_pts = 999999
+            base_pts = 90
+        elif isinstance(self, King):
+            base_pts = 999999
         elif base_pts == 0:
             return 0
         
         points = base_pts
         enemy_base_pts = 0
         position_pts = 0
-        # Für das Schlagen eines pieces bekommt man die enemy base pts * 5
+        # Schlagen von pieces
         valid_cells = self.get_valid_cells()
         for cell in valid_cells:
             enemy_base_pts = 0
             position_pts = 0
             occupant = self.board.get_cell(cell)
-            if isinstance(occupant, Pawn):
-                enemy_base_pts = 1
-            elif isinstance(occupant, Knight) or isinstance(occupant, Bishop):
-                enemy_base_pts = 3
-            elif isinstance(occupant, Rook):
-                enemy_base_pts = 5
-            elif isinstance(occupant, Queen):
-                enemy_base_pts = 9
-            elif isinstance(occupant, King):
-                enemy_base_pts = 999
-            if occupant is not None and base_pts > enemy_base_pts:
-                occupant_valid_cells = occupant.get_valid_cells()
-                for occupant_move in occupant_valid_cells:
-                    if tuple(self.cell) == occupant_move:
-                        position_pts = (enemy_base_pts - base_pts) * 10
-
-            if tuple(self.cell) == cell:
-                enemy_base_pts *= 3
-
-        points += enemy_base_pts - position_pts
-        
-        # Für jede gegnerische Figur wird evaluate ausgeführt und dieser Wert der Figur hinzugefügt
-        # position = self.cell
-        # check_factor = 1
-        # valid_cells = self.get_valid_cells()
-        # for cell in valid_cells:
-        #     enemy = self.board.get_cell(cell)
-        #     enemy_base_pts = 0
-        #     if enemy is not None:
-                
-        #         if isinstance(enemy, Pawn):
-        #             enemy_base_pts = 1
-        #         elif isinstance(enemy, Knight) or isinstance(enemy, Bishop):
-        #             enemy_base_pts = 3
-        #         elif isinstance(enemy, Rook):
-        #             enemy_base_pts = 5
-        #         elif isinstance(enemy, Queen):
-        #             enemy_base_pts = 9
-
-
-        #         points += enemy_base_pts
-            # find_king = self.get_reachable_cells()
-            # king_cell = tuple(self.board.find_king(not self.white).cell)
-
-            # for cell in find_king:
-            #     if cell == king_cell:
-            #         points += 999999
-
-
-            #self.board.set_cell(cell, self)
-            #if self.board.is_king_check(not self.white):
-                #check_factor += 0.5                  # erhoeht den score fuer jeden naechsten Zug der den gegnerischen Koenig ins Schach setzt 
+            if occupant is not None:
+                if isinstance(occupant, Pawn):
+                    enemy_base_pts = 1
+                elif isinstance(occupant, Knight) or isinstance(occupant, Bishop):
+                    enemy_base_pts = 3
+                elif isinstance(occupant, Rook):
+                    enemy_base_pts = 5
+                elif isinstance(occupant, Queen):
+                    enemy_base_pts = 9
+                elif isinstance(occupant, King):
+                    enemy_base_pts = 99999
             
-            #self.board.set_cell(position, self)
-            #self.board.set_cell(cell, enemy)
+                points += enemy_base_pts / 2
+            
 
 
 
-        # row, col = self.cell
+        row, col = self.cell
 
-        # #Alle rows und cols durchgehen und überprüfen auf welchem ring er steht
-        # if (row == 0 or row == 7) or (col == 0 or col == 7):
-        #     factor = 0.85
-        # elif (row == 1 or row == 6) or (col == 1 or col == 6):
-        #     factor = 0.90
-        # elif (row == 2 or row == 5) or (col == 2 or col == 5):
-        #     factor = 0.95
-        # elif (row == 3 or row == 4) and (col == 3 or col == 4):
-        #     factor = 1
+        #Alle rows und cols durchgehen und überprüfen auf welchem ring er steht
+        if (row == 0 or row == 7) or (col == 0 or col == 7):
+            factor = 0.85
+        elif (row == 1 or row == 6) or (col == 1 or col == 6):
+            factor = 0.90
+        elif (row == 2 or row == 5) or (col == 2 or col == 5):
+            factor = 0.95
+        elif (row == 3 or row == 4) and (col == 3 or col == 4):
+            factor = 1
         
-        # final_points = points * factor 
-        return points
+        final_points = points * factor 
+        return final_points
     
 
     def get_valid_cells(self):
@@ -185,7 +144,7 @@ class Piece:
         for cell in reachable_cells:
             enemy = self.board.get_cell(cell)
             self.board.set_cell(cell, self)
-            if not self.board.is_king_check(self.white):
+            if not self.board.is_king_check_cached(self.white):
                 valid_cells.append(cell)
             self.board.set_cell(og_cell, self)
             self.board.set_cell(cell, enemy)
