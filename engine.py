@@ -181,7 +181,33 @@ def minMax(board, minMaxArg):
     :return: Return the best move to make in the current situation.
     :rtype: :py:class:`Move`
     """
-    # TODO: Implement the Mini-Max algorithm
+
+    all_evaluated_moves = evaluate_all_possible_moves(board, minMaxArg) 
+    if not all_evaluated_moves: # falls leer
+        if minMaxArg.playAsWhite:
+            return Move(None, None, score=-99999099999) # falls weiß
+        else:
+            return Move(None, None, score=99999999999) # falls schwarz
+    if minMaxArg.depth == 1:
+        return all_evaluated_moves[0]
+    
+    if minMaxArg.depth > 1:
+        for move in all_evaluated_moves:
+            og_cell = move.piece.cell
+            occupant = board.get_cell(move.cell)
+            occupant_cell = move.cell
+            minMax_score = minMax_cached(board, minMaxArg.next())
+            move = Move(move.piece, move.cell, minMax_score)
+            board.set_cell(og_cell, move.piece)
+            board.set_cell(occupant_cell, occupant)
+            
+        if minMaxArg.playAsWhite:
+            all_evaluated_moves.sort(reverse=True, key=lambda x: x.score)
+        else:
+            all_evaluated_moves.sort(reverse=False, key=lambda x: x.score)
+
+
+        return all_evaluated_moves[0]
 
 
 def suggest_random_move(board):

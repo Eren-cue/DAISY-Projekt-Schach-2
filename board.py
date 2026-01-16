@@ -271,7 +271,7 @@ class Board(BoardBase):
         """
 
     def is_king_check(self, white):
-        if self.find_king is not None:
+        if self.find_king(white) is not None:
             king_cell = tuple(self.find_king(white).cell)    #Speichert die Zelle des Koenigs
 
             for opponent in self.iterate_cells_with_pieces(not white):
