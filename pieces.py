@@ -14,9 +14,9 @@ class Piece:
         :param board: Reference to the board this piece is placed on
         :type board: :ref:class:`board`
         """
-        self.board = board
-        self.white = white
-        self.cell = None
+        self.board = board      #reference to the board
+        self.white = white      #colour of the piece (True=white, False=black)
+        self.cell = None        #cell/position of the piece; tuple of row and colum
 
 
 
@@ -60,7 +60,10 @@ class Piece:
         
         :return: Return numerical score between -infinity and +infinity. Greater values indicate better evaluation result (more favorable).
         """
+        # each piece gets base points assigned, according to its class
+        
         base_pts = 0
+
         if isinstance(self, Pawn):
             base_pts = 1
         elif isinstance(self, Knight) or isinstance(self, Bishop):
@@ -71,18 +74,18 @@ class Piece:
             base_pts = 9
         elif isinstance(self, King):
             base_pts = 20
-        elif base_pts == 0:
+        elif base_pts == 0:         # controll structure;  for the case that the piece is not an object of any our known classes
             return 0
         
-        points = base_pts
-        enemy_base_pts = 0
-        position_pts = 0
-        # Schlagen von pieces
+        score = base_pts            # these base points are the fondation of this pieces score
+
+        # Schlagen von pieces                   # the ability to hit oposing pieces adds value to the piece;
+                                                # corresponding to the base points of the potentially hitted piece
         valid_cells = self.get_valid_cells()
-        for cell in valid_cells:
+        for cell in valid_cells:                # iterates through all valid cells of the piece
             enemy_base_pts = 0
             occupant = self.board.get_cell(cell)
-            if occupant is not None:
+            if occupant is not None:            # if an opposing piece can be hit in the next move, check the class of the piece
                 if isinstance(occupant, Pawn):
                     enemy_base_pts = 1
                 elif isinstance(occupant, Knight) or isinstance(occupant, Bishop):
@@ -91,28 +94,30 @@ class Piece:
                     enemy_base_pts = 5
                 elif isinstance(occupant, Queen):
                     enemy_base_pts = 9
-                elif isinstance(occupant, King):
+                elif isinstance(occupant, King):    # the equivalent to check (a check is favourable bc of the kings high base points)
                     enemy_base_pts = 20
             
-                points += enemy_base_pts / 10
+                score += enemy_base_pts / 10    #adds a tenth of the potentially hitted opposing piece's base points to the pieces score
             
+                # this is a factor for how likely a piece is gonna hit an opposing piece if it gets the chance to
 
+        #Position on the board/moveability
 
+        row, col = self.cell        # unpacking of the current position of the piece in row and colum (col)
 
-        row, col = self.cell
-
-        #Alle rows und cols durchgehen und überprüfen auf welchem ring er steht
+        # checks with the row and col, how close the current position of the piece is to the center
         if (row == 0 or row == 7) or (col == 0 or col == 7):
-            factor = 0.94
+            position_factor = 0.94
         elif (row == 1 or row == 6) or (col == 1 or col == 6):
-            factor = 0.96
+            position_factor = 0.96
         elif (row == 2 or row == 5) or (col == 2 or col == 5):
-            factor = 0.98
+            position_factor = 0.98
         elif (row == 3 or row == 4) and (col == 3 or col == 4):
-            factor = 1
+            position_factor = 1
         
-        final_points = points * factor 
-        return final_points
+        final_score = score * position_factor       # the closer to the center; the higher the moveability, the higher the position factor
+
+        return final_score          # returns the final score of the evaluation of the piece
 
     def get_valid_cells(self):
         """
@@ -136,17 +141,22 @@ class Piece:
         
         :return: Return True 
         """
-        valid_cells = []
-        og_cell = self.cell
+
+        valid_cells = []                            #creation of a new list which should contain all the valid cells for a piece
+        og_cell = self.cell                         # -> valid cells = possible moves that don't leave or put the own king in a check
         reachable_cells = self.get_reachable_cells()
-        for cell in reachable_cells:
-            enemy = self.board.get_cell(cell)
+       
+        for cell in reachable_cells:                # iterates through all the reachable cells of the piece
+            enemy = self.board.get_cell(cell)       # sets the new position on the board
             self.board.set_cell(cell, self)
-            if not self.board.is_king_check_cached(self.white):
-                valid_cells.append(cell)
-            self.board.set_cell(og_cell, self)
+
+            if not self.board.is_king_check_cached(self.white): # checks if the own king is in check in the newly set position
+                valid_cells.append(cell)                        # if not, appends the cell to valid_cells
+
+            self.board.set_cell(og_cell, self)      # reapplies the original board configurations
             self.board.set_cell(cell, enemy)
-        return valid_cells
+
+        return valid_cells                          # returns a list of the valid cells of the piece
             
 
 class Pawn(Piece):  # Bauer
@@ -173,30 +183,30 @@ class Pawn(Piece):  # Bauer
         
         :return: A list of reachable cells this pawn could move into.
         """
-        reachable_cells = []
-        row, col = self.cell
+        reachable_cells = []        # creation of a list that should contain all the cells the pawn can reach in its next move;
+        row, col = self.cell        # following the rules and in consideration of the current board configuration
 
-        if self.white == True:
-            if self.board.cell_is_valid_and_empty((row+1, col)):
-                reachable_cells.append((row+1, col))
-                if row == 1 and self.board.cell_is_valid_and_empty((3, col)):
-                    reachable_cells.append((3, col))
-            if self.can_hit_on_cell((row+1, col+1)):
-                reachable_cells.append((row+1, col+1))
-            if self.can_hit_on_cell((row+1, col-1)):
+        if self.white == True:      # white pawns
+            if self.board.cell_is_valid_and_empty((row+1, col)):                # can always move one cell 'up' the board;
+                reachable_cells.append((row+1, col))                            # if this cell is valid and empty
+                if row == 1 and self.board.cell_is_valid_and_empty((3, col)):   # can move two cells 'up' the board on its first move;
+                    reachable_cells.append((3, col))                            # if both of these cells are valid and empty
+            if self.can_hit_on_cell((row+1, col+1)):                       
+                reachable_cells.append((row+1, col+1))       # can hit one cell diagonally 'up' the board 
+            if self.can_hit_on_cell((row+1, col-1)):         # if this cell has a piece of the opposing colour (black) on it
                 reachable_cells.append((row+1, col-1))
 
-        if self.white == False:
-            if self.board.cell_is_valid_and_empty((row-1, col)):
-                reachable_cells.append((row-1, col))
-                if row == 6 and self.board.cell_is_valid_and_empty((4, col)):
-                    reachable_cells.append((4, col))
+        if self.white == False:     # black pawns
+            if self.board.cell_is_valid_and_empty((row-1, col)):                # can always move one cell 'down' the board;
+                reachable_cells.append((row-1, col))                            # if this cell is valid and empty
+                if row == 6 and self.board.cell_is_valid_and_empty((4, col)):   # can move two cells 'down' the board on its first move;
+                    reachable_cells.append((4, col))                            # if both of these cells are valid and empty
             if self.can_hit_on_cell((row-1, col+1)):
-                reachable_cells.append((row-1, col+1))
-            if self.can_hit_on_cell((row-1, col-1)):
+                reachable_cells.append((row-1, col+1))      # can hit one cell diagonally 'down' the board
+            if self.can_hit_on_cell((row-1, col-1)):        # if this cell has a piece of the opposing colour (white) on it
                 reachable_cells.append((row-1, col-1))
 
-        return reachable_cells
+        return reachable_cells      # returns the list of reachable cells
 
 
 class Rook(Piece):  # Turm
@@ -219,22 +229,24 @@ class Rook(Piece):  # Turm
 
         :return: A list of reachable cells this rook could move into.
         """
-        reachable_cells = []
-        row, col = self.cell
+        reachable_cells = []        # creation of a list that should contain all the cells the rook can reach in its next move
+        row, col = self.cell        # unpacking of the current position of the rook in row and colum (col)
+
+        # the rook moves vertically or horizontally
 
        #vertikale Bewegung
 
-        for r in range(row+1, 8):
+        for r in range(row+1, 8):           # iteration vertically 'up' the board
         
-            if self.board.cell_is_valid_and_empty((r, col)):
+            if self.board.cell_is_valid_and_empty((r, col)):    # check if the cell is valid and empty
+                reachable_cells.append((r, col))                # if v and e; append cell and continue iteration
+            elif self.can_hit_on_cell((r, col)):                # if not v and e; check if the rook can hit on this cell an opponent
                 reachable_cells.append((r, col))
-            elif self.can_hit_on_cell((r, col)):
-                reachable_cells.append((r, col))
-                break
-            else:
+                break                                           # if rook can hit; append the cell and break
+            else:                                               # if not v and e + rook can't hit; break
                 break
                 
-        for r in reversed(range(0, row)):
+        for r in reversed(range(0, row)):   # iteration vertically 'down' the board
         
             if self.board.cell_is_valid_and_empty((r, col)):
                 reachable_cells.append((r, col))
@@ -246,7 +258,7 @@ class Rook(Piece):  # Turm
 
         #horizontale Bewegung
 
-        for c in reversed(range(0, col)):
+        for c in reversed(range(0, col)):   # iteration horizontally to the 'left' on the board
         
             if self.board.cell_is_valid_and_empty((row, c)):
                 reachable_cells.append((row, c))
@@ -256,7 +268,7 @@ class Rook(Piece):  # Turm
             else:
                 break
         
-        for c in range(col+1, 8):
+        for c in range(col+1, 8):           # iteration horizontally to the 'right' on the board
         
             if self.board.cell_is_valid_and_empty((row, c)):
                 reachable_cells.append((row, c))
@@ -266,7 +278,7 @@ class Rook(Piece):  # Turm
             else:
                 break
                 
-        return reachable_cells
+        return reachable_cells              # returns the list of reachable cells
 
 
 class Knight(Piece):  # Springer
@@ -289,38 +301,40 @@ class Knight(Piece):  # Springer
 
         :return: A list of reachable cells this knight could move into.
         """
-        reachable_cells = []
-        row, col = self.cell
+        reachable_cells = []                # creation of a list that should contain all the cells the knight can reach in its next move
+        row, col = self.cell                # unpacking of the current position of the knight in row and colum (col)
+
+        # Movement pattern of the knight is an "L"-Shape (two cells vertically/horizontally and one cell horizontally/vertically)
 
         # 'bw' Bewegung
-        if self.can_enter_cell((row-2, col+1)):
-            reachable_cells.append((row-2, col+1))
+        if self.can_enter_cell((row-2, col+1)):         # checks if the knight can enter the cell 'down' the board to the 'right' 
+            reachable_cells.append((row-2, col+1))      # can enter cell = valid cell, which is empty or contains an opposing piece
 
-        if self.can_enter_cell((row-2, col-1)):
+        if self.can_enter_cell((row-2, col-1)):         # checks if the knight can enter the cell 'down' the board to the 'left'
             reachable_cells.append((row-2, col-1))
 
-        # 'fw' Bewegung
+        # 'fw' Bewegung                                 # checks if the knight can enter the cells 'up' the board, to the 'right' or 'left'
         if self.can_enter_cell((row+2, col+1)):
             reachable_cells.append((row+2, col+1))
 
         if self.can_enter_cell((row+2, col-1)):
             reachable_cells.append((row+2, col-1))
 
-        # 'li' Bewegung
+        # 'li' Bewegung                                 # checks if the knight can enter the cells to the 'left', 'up' or 'down' the board
         if self.can_enter_cell((row+1, col-2)):
             reachable_cells.append((row+1, col-2))
 
         if self.can_enter_cell((row-1, col-2)):
             reachable_cells.append((row-1, col-2))
 
-        # 'rt' Bewegung
+        # 'rt' Bewegung                                 # checks if the knight can enter the cells to the 'right', 'up' or 'down' the board
         if self.can_enter_cell((row+1, col+2)):
             reachable_cells.append((row+1, col+2))
 
         if self.can_enter_cell((row-1, col+2)):
             reachable_cells.append((row-1, col+2))
 
-        return reachable_cells
+        return reachable_cells              # returns the list of reachable cells
 
 
 class Bishop(Piece):  # Läufer
@@ -342,13 +356,27 @@ class Bishop(Piece):  # Läufer
 
         :return: A list of reachable cells this bishop could move into.
         """
-        reachable_cells = []
-        row, col = self.cell
+        reachable_cells = []            # creation of a list that should contain all the cells the bishop can reach in its next move
+        row, col = self.cell            # unpacking of the current position of the bishop in row and colum (col)
 
-        # 'fw-rt' Bewegung
+        # the bishop can move diagonally
+
+        # 'fw-rt' Bewegung                                              # movement diagonally 'up' the board and to the 'right'
         cols = col
-        for diagonal_r in range(row+1, 8):
-            cols = cols + 1
+        for diagonal_r in range(row+1, 8):                              # iteration 'up' the board (row+1)
+            cols = cols + 1                                             # each iteration step also one cell to the 'right' (cols+1)
+            if self.board.cell_is_valid_and_empty((diagonal_r, cols)):  # check if the cell is valid and empty
+                reachable_cells.append((diagonal_r, cols))              # if v and e; append cell and continue iteration
+            elif self.can_hit_on_cell((diagonal_r, cols)):              # if not v and e; check if the bishop can hit on this cell an opponent
+                reachable_cells.append((diagonal_r, cols))
+                break                                                   # if bishop can hit; append the cell and break
+            else:                                                       # if not v and e + bishop can't hit; break
+                break
+
+        # 'bw-rt' Bewegung                                              # movement diagonally 'down' the board and to the 'right'
+        cols = col
+        for diagonal_r in reversed(range(0, row)):                      # iteration 'down' the board (row-1)
+            cols = cols + 1                                             # each iteration step also one cell to the 'right' (cols+1)
             if self.board.cell_is_valid_and_empty((diagonal_r, cols)):
                 reachable_cells.append((diagonal_r, cols))
             elif self.can_hit_on_cell((diagonal_r, cols)):
@@ -357,10 +385,10 @@ class Bishop(Piece):  # Läufer
             else:
                 break
 
-        # 'bw-rt' Bewegung
+        # 'fw-li' Bewegung                                              # movement diagonally 'up' the board and to the 'left'
         cols = col
-        for diagonal_r in reversed(range(0, row)):
-            cols = cols + 1
+        for diagonal_r in range(row+1, 8):                              # iteration 'up' the board (row+1)
+            cols = cols - 1                                             # each iteration step also one cell to the 'left' (cols-1)
             if self.board.cell_is_valid_and_empty((diagonal_r, cols)):
                 reachable_cells.append((diagonal_r, cols))
             elif self.can_hit_on_cell((diagonal_r, cols)):
@@ -369,22 +397,10 @@ class Bishop(Piece):  # Läufer
             else:
                 break
 
-        # 'fw-li' Bewegung
+        # 'bw-li' Bewegung                                              # movement diagonally 'down' the board and to the 'left'
         cols = col
-        for diagonal_r in range(row+1, 8):
-            cols = cols - 1
-            if self.board.cell_is_valid_and_empty((diagonal_r, cols)):
-                reachable_cells.append((diagonal_r, cols))
-            elif self.can_hit_on_cell((diagonal_r, cols)):
-                reachable_cells.append((diagonal_r, cols))
-                break
-            else:
-                break
-
-        # 'bw-li' Bewegung
-        cols = col
-        for diagonal_r in reversed(range(0, row)):
-            cols = cols - 1
+        for diagonal_r in reversed(range(0, row)):                      # iteration 'down' the board (row-1)
+            cols = cols - 1                                             # each iteration step also one cell to the 'left' (cols-1)
             if self.board.cell_is_valid_and_empty((diagonal_r, cols)):
                 reachable_cells.append((diagonal_r, cols))
             elif self.can_hit_on_cell((diagonal_r, cols)):
@@ -393,7 +409,7 @@ class Bishop(Piece):  # Läufer
             else:
                 break
                 
-        return reachable_cells
+        return reachable_cells              # returns the list of reachable cells
 
 
 class Queen(Piece):  # Königin
@@ -416,12 +432,14 @@ class Queen(Piece):  # Königin
 
         :return: A list of reachable cells this queen could move into.
         """
-        reachable_cells = []
-        row, col = self.cell
+        reachable_cells = []            # creation of a list that should contain all the cells the queen can reach in its next move
+        row, col = self.cell            # unpacking of the current position of the queen in row and colum (col)
+
+        # the queen can move horizontally, vertically or diagonally
 
         #vertikale Bewegung
 
-        for r in range(row+1, 8):
+        for r in range(row+1, 8):           # iteration vertically 'up' the board
         
             if self.board.cell_is_valid_and_empty((r, col)):
                 reachable_cells.append((r, col))
@@ -431,7 +449,7 @@ class Queen(Piece):  # Königin
             else:
                 break
                 
-        for r in reversed(range(0, row)):
+        for r in reversed(range(0, row)):   # iteration vertically 'down' the board
         
             if self.board.cell_is_valid_and_empty((r, col)):
                 reachable_cells.append((r, col))
@@ -443,7 +461,7 @@ class Queen(Piece):  # Königin
 
         #horizontale Bewegung
 
-        for c in reversed(range(0, col)):
+        for c in reversed(range(0, col)):   # iteration horizontally to the 'left'
         
             if self.board.cell_is_valid_and_empty((row, c)):
                 reachable_cells.append((row, c))
@@ -453,7 +471,7 @@ class Queen(Piece):  # Königin
             else:
                 break
         
-        for c in range(col+1, 8):
+        for c in range(col+1, 8):           # iteration horizontally to the 'right'
         
             if self.board.cell_is_valid_and_empty((row, c)):
                 reachable_cells.append((row, c))
@@ -463,7 +481,7 @@ class Queen(Piece):  # Königin
             else:
                 break
                 
-        # 'fw-rt' Bewegung
+        # 'fw-rt' Bewegung                  # movement diagonally 'up' the board and to the 'right'
         cols = col
         for diagonal_r in range(row+1, 8):
             cols = cols + 1
@@ -475,7 +493,7 @@ class Queen(Piece):  # Königin
             else:
                 break
 
-        # 'bw-rt' Bewegung
+        # 'bw-rt' Bewegung                  # movement diagonally 'down' the board and to the 'right'
         cols = col
         for diagonal_r in reversed(range(0, row)):
             cols = cols + 1
@@ -487,7 +505,7 @@ class Queen(Piece):  # Königin
             else:
                 break
 
-        # 'fw-li' Bewegung
+        # 'fw-li' Bewegung                  # movement diagonally 'up' the board and to the 'left'
         cols = col
         for diagonal_r in range(row+1, 8):
             cols = cols - 1
@@ -499,7 +517,7 @@ class Queen(Piece):  # Königin
             else:
                 break
 
-        # 'bw-li' Bewegung
+        # 'bw-li' Bewegung                  # movement diagonally 'down' the board and to the 'left'
         cols = col
         for diagonal_r in reversed(range(0, row)):
             cols = cols - 1
@@ -511,7 +529,7 @@ class Queen(Piece):  # Königin
             else:
                 break
 
-        return reachable_cells
+        return reachable_cells          # returns the list of reachable cells
 
 
 class King(Piece):  # König
@@ -533,16 +551,16 @@ class King(Piece):  # König
 
         :return: A list of reachable cells this king could move into.
         """
-        reachable_cells = []
-        row, col = self.cell
+        reachable_cells = []            # creation of a list that should contain all the cells the king can reach in its next move
+        row, col = self.cell            # unpacking of the current position of the king in row and colum (col)
 
-        #Bewegung im 1-Feld-Abstand + Ausnahme (0,0)
+        # the king can move one cell in any direction (horizontally, vertically, diagonally)
 
-        for i_r in range(-1,2):
-            for i_c in range(-1,2):
-                if i_r == 0 and i_c == 0:
+        for i_r in range(-1,2):                                 # iteration over [-1, 0, 1] = summand to the row
+            for i_c in range(-1,2):                             # iteration over [-1, 0, 1] = summand to the colum
+                if i_r == 0 and i_c == 0:                       # if both summands are 0 -> continue iteration; (bc (row+0, col+0) == current position)
                     continue
-                if self.can_enter_cell((row+i_r, col+i_c)):
-                    reachable_cells.append((row+i_r, col+i_c))
+                if self.can_enter_cell((row+i_r, col+i_c)):     # checks if the king can enter the cell
+                    reachable_cells.append((row+i_r, col+i_c))  # can enter cell = valid cell, which is empty or contains an opposing piece
 
-        return reachable_cells
+        return reachable_cells          # returns the list of reachable cells
