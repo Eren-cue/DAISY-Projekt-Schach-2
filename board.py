@@ -230,11 +230,11 @@ class Board(BoardBase):
 
     def iterate_cells_with_pieces(self, white):
 
-        for row in range(8):
-            for col in range(8):
-                occupant = self.get_cell((row,col))
-                if occupant is not None and occupant.white == white:
-                    yield self.get_cell((row, col))
+        for row in range(8):        # durch reihen
+            for col in range(8):    # spalten
+                occupant = self.get_cell((row,col)) # holen Inhalt (none,Piece)
+                if occupant is not None and occupant.white == white: # wenn nicht none ist es weiß
+                    yield self.get_cell((row, col))         # gibt piece (yield pausiert und sucht beim nächsten aufruf weiter)
 
         """
         **TODO**: Write a generator (using the yield keyword) that allows to iterate
@@ -250,10 +250,10 @@ class Board(BoardBase):
 
     def find_king(self, white):
 
-        for piece in self.iterate_cells_with_pieces(white):
+        for piece in self.iterate_cells_with_pieces(white):     # gibt alle pieces
 
-            if isinstance(piece, King):
-                return piece
+            if isinstance(piece, King):         # wenn könig 
+                return piece                    # dann gib Piece (Positiion, Farbe)
 
       
         # automatisch return None, wenn no King on the board
@@ -274,15 +274,15 @@ class Board(BoardBase):
         if self.find_king(white) is not None:
             king_cell = tuple(self.find_king(white).cell)    #Speichert die Zelle des Koenigs
 
-            for opponent in self.iterate_cells_with_pieces(not white):
-                possible_moves_op = opponent.get_reachable_cells()
+            for opponent in self.iterate_cells_with_pieces(not white): # Holen Gegner Figuren
+                possible_moves_op = opponent.get_reachable_cells()     # welche felder kann er hitten
 
-                for move in possible_moves_op:
+                for move in possible_moves_op:      # ist der König in der Liste
 
-                    if move == king_cell:
+                    if move == king_cell:  # ja = Schach
                         return True
             
-            return False
+            return False                   
 
         """
         **TODO**: Evaluate if the king of given color is currently in check.
@@ -306,9 +306,9 @@ class Board(BoardBase):
         Then use the iterate_cells_with_pieces Method to find all BLACK pieces, call their respective "evaluate" Method and substract that from the score.
         """
         score = 0.0
-        for white_piece in self.iterate_cells_with_pieces(True):
+        for white_piece in self.iterate_cells_with_pieces(True): # weiß durchgehen wert addieren
             score += white_piece.evaluate()
-        for black_piece in self.iterate_cells_with_pieces(False):
+        for black_piece in self.iterate_cells_with_pieces(False): # schwarz durchgehen wert addieren
             score -= black_piece.evaluate()
         return score
     
@@ -322,15 +322,15 @@ class Board(BoardBase):
         being within the allowed range (0 to 7 inclusively).
         Don´t forget to handle the special case of "cell" being None. Return False in that case
         """
-        if cell is None:
+        if cell is None:  # gibt es die zelle
             return False
 
-        row, col = cell
+        row, col = cell  # tupel entpacken
     
-        if row < 0 or row > 7:
+        if row < 0 or row > 7: # ist sie im Feld der Zeilen
             return False
         
-        elif col < 0 or col > 7:
+        elif col < 0 or col > 7: # ist siem feld der Spalten
             return False
     
         else:
@@ -344,8 +344,8 @@ class Board(BoardBase):
         You can use the "is_valid_cell()" Method to verify the cell is valid in the first place.
         If so, use "get_cell()" to retrieve the piece placed on it and return True if there is None
         """
-        if self.is_valid_cell(cell):
-            if self.get_cell(cell) is None:
+        if self.is_valid_cell(cell): # gibt es die Zelle
+            if self.get_cell(cell) is None: # steht was auf dem feld
                 return True
         
         else:
@@ -366,10 +366,10 @@ class Board(BoardBase):
         If, however, there is another piece, it must be of opposing color. Check the other pieces "white" attribute and compare against
         the given piece "white" attribute.
         """
-        if self.is_valid_cell(cell):
-            if self.get_cell(cell) is None:
+        if self.is_valid_cell(cell): # gibt es feld
+            if self.get_cell(cell) is None: # leer?
                 return True
-            elif piece.white is not self.get_cell(cell).white:
+            elif piece.white is not self.get_cell(cell).white: # wenn besetzt ist es schlagbar
                 return True
         else:
             return False
@@ -390,9 +390,9 @@ class Board(BoardBase):
         If, however, there is another piece, it must be of opposing color. Check the other pieces "white" attribute and compare against
         the given piece "white" attribute.
         """
-        if self.is_valid_cell(cell):
-            if self.get_cell(cell) is not None:
-                if self.get_cell(cell).is_white() is not piece.is_white():
+        if self.is_valid_cell(cell):  # gibt es die Zelle
+            if self.get_cell(cell) is not None: # wenn sie besetzt ist
+                if self.get_cell(cell).is_white() is not piece.is_white(): #kann ich sie schlagen (Gegner Farbe)
                     return True
     
         else:
