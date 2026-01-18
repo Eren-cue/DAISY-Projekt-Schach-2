@@ -306,24 +306,12 @@ class Board(BoardBase):
         Then use the iterate_cells_with_pieces Method to find all BLACK pieces, call their respective "evaluate" Method and substract that from the score.
         """
         score = 0.0
-        white_king_on_board = False
-        black_king_on_board = False
         for white_piece in self.iterate_cells_with_pieces(True):
             score += white_piece.evaluate()
-            if isinstance(white_piece, King):
-                white_king_on_board = True
         for black_piece in self.iterate_cells_with_pieces(False):
             score -= black_piece.evaluate()
-            if isinstance(black_piece, King):
-                black_king_on_board = True
-
-        if not white_king_on_board and black_king_on_board:
-            return -9999999999
-        elif not black_king_on_board and white_king_on_board:
-            return 9999999999
-        else:
-            return score
-
+        return score
+    
     def is_valid_cell(self, cell):
         """
         **TODO**: Check if the given cell coordinates are valid. A cell coordinate is valid if both
