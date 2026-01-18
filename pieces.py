@@ -48,7 +48,7 @@ class Piece:
         """
         return self.board.piece_can_hit_on_cell(self, cell)
 
-    def evaluate(self):
+    def evaluate(self,test_sit=False):
         """
         **TODO** Implement a meaningful numerical evaluation of this piece on the board.
         This evaluation happens independent of the color as later, values for white pieces will be added and values for black pieces will be substracted. 
@@ -79,45 +79,48 @@ class Piece:
         
         score = base_pts            # these base points are the fondation of this pieces score
 
-        # Schlagen von pieces                   # the ability to hit oposing pieces adds value to the piece;
-                                                # corresponding to the base points of the potentially hitted piece
-        valid_cells = self.get_valid_cells()
-        for cell in valid_cells:                # iterates through all valid cells of the piece
-            enemy_base_pts = 0
-            occupant = self.board.get_cell(cell)
-            if occupant is not None:            # if an opposing piece can be hit in the next move, check the class of the piece
-                if isinstance(occupant, Pawn):
-                    enemy_base_pts = 1
-                elif isinstance(occupant, Knight) or isinstance(occupant, Bishop):
-                    enemy_base_pts = 3
-                elif isinstance(occupant, Rook):
-                    enemy_base_pts = 5
-                elif isinstance(occupant, Queen):
-                    enemy_base_pts = 9
-                elif isinstance(occupant, King):    # the equivalent to check (a check is favourable bc of the kings high base points)
-                    enemy_base_pts = 20
+        if not test_sit:            # more complex evaluation vor the ai
             
-                score += enemy_base_pts / 10    #adds a tenth of the potentially hitted opposing piece's base points to the pieces score
-            
-                # this is a factor for how likely a piece is gonna hit an opposing piece if it gets the chance to
+            # Bedrohen von pieces                   # the ability to hit oposing pieces in the next move adds value to the piece;
+            offensive_base_factor = 1               # corresponding to the base points of the potentially hitted piece
+            valid_cells = self.get_valid_cells()
+            for cell in valid_cells:                # iterates through all valid cells of the piece
+                
+                occupant = self.board.get_cell(cell)
+                if occupant is not None:            # if an opposing piece can be hit in the next move, check the class of the piece
+                    if isinstance(occupant, Pawn):
+                        enemy_base_pts = 1
+                    elif isinstance(occupant, Knight) or isinstance(occupant, Bishop):
+                        enemy_base_pts = 3
+                    elif isinstance(occupant, Rook):
+                        enemy_base_pts = 5
+                    elif isinstance(occupant, Queen):
+                        enemy_base_pts = 9
+                    elif isinstance(occupant, King):    # the equivalent to check (a check is favourable bc of the kings high base points)
+                        enemy_base_pts = 20
+                
+                    offensive_base_factor += enemy_base_pts / 10    #adds a tenth of the potentially hitted opposing piece's base points to the offensive base factor
+                
+                    # this is a factor for how likely a piece is gonna hit an opposing piece if it gets the chance to
+            score *= offensive_base_factor
+            #Position on the board/moveability
 
-        #Position on the board/moveability
-
-        row, col = self.cell        # unpacking of the current position of the piece in row and colum (col)
-
-        # checks with the row and col, how close the current position of the piece is to the center
-        if (row == 0 or row == 7) or (col == 0 or col == 7):
-            position_factor = 0.94
-        elif (row == 1 or row == 6) or (col == 1 or col == 6):
-            position_factor = 0.96
-        elif (row == 2 or row == 5) or (col == 2 or col == 5):
-            position_factor = 0.98
-        elif (row == 3 or row == 4) and (col == 3 or col == 4):
+            row, col = self.cell        # unpacking of the current position of the piece in row and colum (col)
             position_factor = 1
-        
-        final_score = score * position_factor       # the closer to the center; the higher the moveability, the higher the position factor
+            # checks with the row and col, how close the current position of the piece is to the center
+            if not isinstance(self, King):
+                if (row == 0 or row == 7) or (col == 0 or col == 7):
+                    position_factor = 0.94
+                elif (row == 1 or row == 6) or (col == 1 or col == 6):
+                    position_factor = 0.96
+                elif (row == 2 or row == 5) or (col == 2 or col == 5):
+                    position_factor = 0.98
+                elif (row == 3 or row == 4) and (col == 3 or col == 4):
+                    position_factor = 1
+            
+            score *= position_factor       # the closer to the center; the higher the moveability, the higher the position factor
 
-        return final_score          # returns the final score of the evaluation of the piece
+        return score          # returns the score of the evaluation of the piece
 
     def get_valid_cells(self):
         """
