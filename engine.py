@@ -93,25 +93,26 @@ def evaluate_all_possible_moves(board, minMaxArg, maximumNumberOfMoves = 10):
     After sorting, a maximum number of moves as provided by the respective parameter must be returned. If there are 
     more moves possible (in most situations there are), only return the top (or worst). Hint: Slice the list after sorting. 
     """
-    color = minMaxArg.playAsWhite # True = White, False = Black
-    list_moves = []
-    for piece in board.iterate_cells_with_pieces(color):
-        og_cell = piece.cell
+    color = minMaxArg.playAsWhite       # saves into a variable if piece is white, True = White, False = Black
+    list_moves = []                     
+    for piece in board.iterate_cells_with_pieces(color):     # iterates through every piece of given color
+        og_cell = piece.cell    # saves the original cell of own piece
         moves = piece.get_valid_cells()
-        for move in moves:
-            occupant = board.get_cell(move)
-            board.set_cell(move, piece)
+        for move in moves:      # iterates through valid cells of own piece
+            occupant = board.get_cell(move)     # saves the cell of occupant piece
+            board.set_cell(move, piece)         # sets the own piece on iterated cell
             points = board.evaluate()
 
-            list_moves.append(Move(piece, move, points))
+            list_moves.append(Move(piece, move, points))    # adds Moves with their respective score into the list
             if color:
-                list_moves.sort(reverse=True, key=lambda x: x.score)
+                list_moves.sort(reverse=True, key=lambda x: x.score)    # if white then sort in descending order
             else:
-                list_moves.sort(reverse=False, key=lambda x: x.score)
+                list_moves.sort(reverse=False, key=lambda x: x.score)   # if black then sort in ascending order
 
-            board.set_cell(og_cell, piece)
-            board.set_cell(move, occupant)
-    list_moves = list_moves[:maximumNumberOfMoves]
+            board.set_cell(og_cell, piece)  
+            board.set_cell(move, occupant)  # restores the original board configuration
+
+    list_moves = list_moves[:maximumNumberOfMoves]  # slices the list to the given maximum moves (default 10)
     return list_moves
 
 
@@ -182,33 +183,33 @@ def minMax(board, minMaxArg):
     :rtype: :py:class:`Move`
     """
 
-    all_evaluated_moves = evaluate_all_possible_moves(board, minMaxArg) 
-    if not all_evaluated_moves: # falls leer
+    all_evaluated_moves = evaluate_all_possible_moves(board, minMaxArg)  # saves the moves with their scores into a variable
+    if not all_evaluated_moves:     # if empty
         if minMaxArg.playAsWhite:
-            return Move(None, None, score=-99999099999) # falls weiß
+            return Move(None, None, score=-99999999999) # if white, black wins
         else:
-            return Move(None, None, score=99999999999) # falls schwarz
+            return Move(None, None, score=99999999999) # if black, white wins
     if minMaxArg.depth == 1:
-        return all_evaluated_moves[0]
+        return all_evaluated_moves[0] # returns the best move possible if depth == 1
     
     if minMaxArg.depth > 1:
-        for move in all_evaluated_moves:
-            active_piece = move.piece
-            og_cell = active_piece.cell
-            occupant = board.get_cell(move.cell)
-            board.set_cell(move.cell, active_piece)
-            move.score = minMax_cached(board, minMaxArg.next()).score
+        for move in all_evaluated_moves:    # iterates through every evaluated move (Move objects)
+            active_piece = move.piece       
+            og_cell = active_piece.cell     # saves the orignal cell of the own piece
+            occupant = board.get_cell(move.cell)    # retrieves the piece object of the occupant and saves it
+            board.set_cell(move.cell, active_piece) # sets the own piece into the iterated cell
+            move.score = minMax_cached(board, minMaxArg.next()).score   # overwrites the score in the current Move object with the next minMaxArg
             board.set_cell(og_cell, active_piece)
-            board.set_cell(move.cell, occupant)
+            board.set_cell(move.cell, occupant) # restores the original board configuration
             
         if minMaxArg.playAsWhite:
-            all_evaluated_moves.sort(reverse=True, key=lambda x: x.score)
+            all_evaluated_moves.sort(reverse=True, key=lambda x: x.score) # if white then sort in descending order
         else:
-            all_evaluated_moves.sort(reverse=False, key=lambda x: x.score)
+            all_evaluated_moves.sort(reverse=False, key=lambda x: x.score) # if black then sort in ascending order
 
         best_three_moves = all_evaluated_moves[:3]
         return random.choice(best_three_moves)
-        # return all_evaluated_moves[0] # ohne random moves
+        #return all_evaluated_moves[0] # without the best three moves (only the best)
 
     
 
@@ -226,16 +227,16 @@ def suggest_random_move(board):
     If there are no legal moves at all, return None.
     """
     moveable_pieces = []
-    for piece in board.iterate_cells_with_pieces(True):
-        if len(piece.get_valid_cells()) != 0:
-            moveable_pieces.append(piece)
+    for piece in board.iterate_cells_with_pieces(True): # iterates through all white pieces
+        if len(piece.get_valid_cells()) != 0:   # if the piece can move
+            moveable_pieces.append(piece)   # mark the piece as moveable piece
     
-    if len(moveable_pieces) == 0:
-        return None
+    if len(moveable_pieces) == 0: 
+        return None # if there arent any moveable pieces, return None
     
     else:
-        rdm_piece = random.choice(moveable_pieces)
-        rdm_move = random.choice(rdm_piece.get_valid_cells())
+        rdm_piece = random.choice(moveable_pieces)  # pick one of the moveable pieces
+        rdm_move = random.choice(rdm_piece.get_valid_cells()) # pick on of their valid moves
 
         return Move(rdm_piece, rdm_move, 1)
 

@@ -73,7 +73,7 @@ class Piece:
         elif isinstance(self, Queen):
             base_pts = 9
         elif isinstance(self, King):
-            base_pts = 20
+            base_pts = 999999
         elif base_pts == 0:         # controll structure;  for the case that the piece is not an object of any our known classes
             return 0
         
@@ -85,7 +85,7 @@ class Piece:
             offensive_base_factor = 1               # corresponding to the base points of the potentially hitted piece
             valid_cells = self.get_valid_cells()
             for cell in valid_cells:                # iterates through all valid cells of the piece
-                
+                enemy_base_pts = 0
                 occupant = self.board.get_cell(cell)
                 if occupant is not None:            # if an opposing piece can be hit in the next move, check the class of the piece
                     if isinstance(occupant, Pawn):
@@ -97,12 +97,10 @@ class Piece:
                     elif isinstance(occupant, Queen):
                         enemy_base_pts = 9
                     elif isinstance(occupant, King):    # the equivalent to check (a check is favourable bc of the kings high base points)
-                        enemy_base_pts = 20
-                
-                    offensive_base_factor += enemy_base_pts / 10    #adds a tenth of the potentially hitted opposing piece's base points to the offensive base factor
-                
-                    # this is a factor for how likely a piece is gonna hit an opposing piece if it gets the chance to
-            score *= offensive_base_factor
+                        enemy_base_pts = 12
+                score += enemy_base_pts / 10
+                    
+                    
             #Position on the board/moveability
 
             row, col = self.cell        # unpacking of the current position of the piece in row and colum (col)
@@ -110,11 +108,11 @@ class Piece:
             # checks with the row and col, how close the current position of the piece is to the center
             if not isinstance(self, King):
                 if (row == 0 or row == 7) or (col == 0 or col == 7):
-                    position_factor = 0.94
+                    position_factor = 0.91
                 elif (row == 1 or row == 6) or (col == 1 or col == 6):
-                    position_factor = 0.96
+                    position_factor = 0.94
                 elif (row == 2 or row == 5) or (col == 2 or col == 5):
-                    position_factor = 0.98
+                    position_factor = 0.97
                 elif (row == 3 or row == 4) and (col == 3 or col == 4):
                     position_factor = 1
             
