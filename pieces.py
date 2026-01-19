@@ -48,7 +48,7 @@ class Piece:
         """
         return self.board.piece_can_hit_on_cell(self, cell)
 
-    def evaluate(self,test_sit=False):
+    def evaluate(self, ai_mode=True):
         """
         **TODO** Implement a meaningful numerical evaluation of this piece on the board.
         This evaluation happens independent of the color as later, values for white pieces will be added and values for black pieces will be substracted. 
@@ -77,9 +77,9 @@ class Piece:
         elif base_pts == 0:         # controll structure;  for the case that the piece is not an object of any our known classes
             return 0
         
-        score = base_pts            # these base points are the fondation of this pieces score
+        score = base_pts            # these base points are the foundation of this pieces score
 
-        if not test_sit:            # more complex evaluation vor the ai
+        if ai_mode:            # more complex evaluation for the ai
             
             # Bedrohen von pieces                   # the ability to hit oposing pieces in the next move adds value to the piece;
             offensive_base_factor = 1               # corresponding to the base points of the potentially hitted piece
@@ -96,17 +96,17 @@ class Piece:
                         enemy_base_pts = 5
                     elif isinstance(occupant, Queen):
                         enemy_base_pts = 9
-                    elif isinstance(occupant, King):    # the equivalent to check (a check is favourable bc of the kings high base points)
+                    elif isinstance(occupant, King):    # the equivalent to check (a check is favourable bc of the king's high base points)
                         enemy_base_pts = 12
-                score += enemy_base_pts / 10
+                score += enemy_base_pts / 10        # adds a tenth of the base points of the hittable piece to the piece
                     
                     
-            #Position on the board/moveability
+            # position on the board/moveability
 
             row, col = self.cell        # unpacking of the current position of the piece in row and colum (col)
             position_factor = 1
             # checks with the row and col, how close the current position of the piece is to the center
-            if not isinstance(self, King):
+            if not isinstance(self, King):          # for all pieces except the king
                 if (row == 0 or row == 7) or (col == 0 or col == 7):
                     position_factor = 0.91
                 elif (row == 1 or row == 6) or (col == 1 or col == 6):
@@ -116,7 +116,7 @@ class Piece:
                 elif (row == 3 or row == 4) and (col == 3 or col == 4):
                     position_factor = 1
             
-            score *= position_factor       # the closer to the center; the higher the moveability, the higher the position factor
+            score *= position_factor    # the closer to the center; the higher the moveability, the higher the position factor
 
         return score          # returns the score of the evaluation of the piece
 

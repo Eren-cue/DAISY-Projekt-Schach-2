@@ -209,7 +209,7 @@ def minMax(board, minMaxArg):
 
         best_three_moves = all_evaluated_moves[:3]
         return random.choice(best_three_moves)
-        #return all_evaluated_moves[0] # without the best three moves (only the best)
+        # return one of the best three moves by random choice
 
     
 
@@ -232,11 +232,11 @@ def suggest_random_move(board):
             moveable_pieces.append(piece)   # mark the piece as moveable piece
     
     if len(moveable_pieces) == 0: 
-        return None # if there arent any moveable pieces, return None
+        return None # if there aren't any moveable pieces, return None
     
     else:
         rdm_piece = random.choice(moveable_pieces)  # pick one of the moveable pieces
-        rdm_move = random.choice(rdm_piece.get_valid_cells()) # pick on of their valid moves
+        rdm_move = random.choice(rdm_piece.get_valid_cells()) # pick one of their valid moves
 
         return Move(rdm_piece, rdm_move, 1)
 

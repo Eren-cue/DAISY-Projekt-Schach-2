@@ -234,7 +234,7 @@ class Board(BoardBase):
             for col in range(8):    # iterate all cell
                 occupant = self.get_cell((row,col)) # get information (none,Piece)
                 if occupant is not None and occupant.white == white: # if not none and white
-                    yield self.get_cell((row, col))         # give piece (yield pauses and search in the next run)
+                    yield self.get_cell((row, col))         # give piece (yield, pauses and search in the next run)
 
         """
         **TODO**: Write a generator (using the yield keyword) that allows to iterate
@@ -275,9 +275,9 @@ class Board(BoardBase):
             king_cell = tuple(self.find_king(white).cell)    # saves cell of the king
 
             for opponent in self.iterate_cells_with_pieces(not white): # get opponent piece
-                possible_moves_op = opponent.get_reachable_cells()     # wich cells can he hitt
+                possible_moves_op = opponent.get_reachable_cells()     # which cells can the opponent reach in next move
 
-                for move in possible_moves_op:      # iis the king in the list
+                for move in possible_moves_op:      # is the king cell in the list
 
                     if move == king_cell:  # yes = check
                         return True
@@ -345,7 +345,7 @@ class Board(BoardBase):
         If so, use "get_cell()" to retrieve the piece placed on it and return True if there is None
         """
         if self.is_valid_cell(cell): # is cell existing
-            if self.get_cell(cell) is None: # something standing on
+            if self.get_cell(cell) is None: # is cell empty (no piece on cell -> None)
                 return True
         
         else:
@@ -367,10 +367,10 @@ class Board(BoardBase):
         the given piece "white" attribute.
         """
         if self.is_valid_cell(cell): # is cell existing
-            if self.get_cell(cell) is None: # empty?
+            if self.get_cell(cell) is None: # checks if cell is empty (no piece on cell -> None)
                 return True
-            elif piece.white is not self.get_cell(cell).white: # is the piece hittable
-                return True
+            elif piece.white is not self.get_cell(cell).white:  # if valid but occupied,
+                return True                                     # checks if piece is of opposing colour (piece is hittable)
         else:
             return False
  
@@ -391,8 +391,8 @@ class Board(BoardBase):
         the given piece "white" attribute.
         """
         if self.is_valid_cell(cell):  # is cell existing
-            if self.get_cell(cell) is not None: # something standing on
-                if self.get_cell(cell).is_white() is not piece.is_white(): # hittable (oponent)
+            if self.get_cell(cell) is not None: #  is something standing on the cell
+                if self.get_cell(cell).is_white() is not piece.is_white(): # is this piece a hittable opponent
                     return True
     
         else:
